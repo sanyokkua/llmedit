@@ -1,0 +1,25 @@
+[project]
+name = "llmedit"
+version = "0.1.0"
+description = "The all-in-one LLM toolkit for editing, styling, and translating."
+authors = [
+    {name = "Oleksandr Kostenko",email = "sanyokkua@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pyqt6 (>=6.9.1,<7.0.0)",
+    "ollama (>=0.5.1,<0.6.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+pyright = "^1.1.403"
+
+[tool.poetry.scripts]
+app = "main:main"

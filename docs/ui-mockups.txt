@@ -1,0 +1,34 @@
++---------------------------------------------------------------+
+| [Logo] Translation App v1.0                 [Dark Mode Toggle]|
++---------------------------------------------------------------+
+| [✓ Translation Mode] [ Text Utilities Mode]                   |
++---------------------------------------------------------------+
+| [Input Pane]                   [Output Pane]                  |
+| • Editable text area           • Read-only result area        |
+| • Source language dropdown     • Target language dropdown     |
+| • Paste From Clipboard btn     • Copy button                  |
++-------------------------------+-------------------------------+
+| [Translate] [Regenerate]      [Model: llama3:8b ▼]            |
+| [Temp: ▌-------slider--------▌] [Progress bar/status]         |
++---------------------------------------------------------------+
+| Status: "Ready" | LLM loaded: llama3:8b (local)               |
++---------------------------------------------------------------+
+
+
++---------------------------------------------------------------+
+| [Logo] Translation App v1.0                 [Dark Mode Toggle]|
++---------------------------------------------------------------+
+| [ Translation Mode] [✓ Text Utilities Mode]                   |
++---------------------------------------------------------------+
+| [Input Pane]                   [Output Pane]                  |
+| • Editable text area           • Read-only result area        |
+| • Paste from clipboard btn     • Copy button                  |
++-------------------------------+-------------------------------+
+| [Proofread]   [Rewrite]   [Regenerate Button]                 |
+| Tone:         [Formal]    [Casual]    [Friendly]              |
+| Format:       [Email]     [Chat]      [Document]              |
+| Structure:    [Articles]  [Documentation]                     |
+| [Temp: ▌-------slider--------▌]   [Model Selector]            |
++---------------------------------------------------------------+
+| Status: "Ready" | LLM loaded: llama3:8b (local)               |
++---------------------------------------------------------------+
