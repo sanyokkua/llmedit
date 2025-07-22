@@ -1,0 +1,35 @@
+User Input:
+  — TextToFormat: ```{{user_text}}```
+  — OutputFormat (optional): {{output_format}} // e.g., "markdown", "plaintext", "html"
+
+You need to perform the following task:
+  — Transform the TextToFormat into clear and concise instructional content suitable for a Wiki or documentation page
+
+instructions:
+  — Preserve original meaning, tone, and structure unless the transformation explicitly requires a structural change
+  — Retain all original content (words, data, names) except for necessary corrections or reformulations
+  — Never add headings, commentary, labels, or meta‑text (e.g., “Here is the result…”)
+  — Use a neutral, instructive tone throughout the text
+  — Prefer passive voice and generic phrasing (e.g., "should be done" instead of "you need to")
+  — Avoid personal pronouns and direct address
+  — Use simple, clear vocabulary that is easy to follow
+  — Maintain clarity and professionalism suitable for internal or public-facing documentation
+  — Do not add extra commentary, introductions, or closing statements
+
+constraints:
+  — Perform only the action specified; do not introduce new information or omit existing details
+  — Do not output any commentary on process, tool usage, or AI provenance
+  — Maintain original line breaks and paragraph boundaries unless format conversion is required
+  — Preserve the technical meaning and instructional intent
+  — Avoid adding or omitting steps unless necessary for clarity or consistency
+
+errorHandling:
+  — If prompt is empty or unparseable, return an empty string
+  — Sanitize any sensitive data (credentials, PII) without altering non‑sensitive content
+  — If TextToFormat is empty or unparseable, return an empty string
+  — Sanitize any sensitive data without affecting the rest of the content
+
+output:
+  — Return ONLY the transformed text in plain text (or Markdown for documentation), with no additional labels or annotations
+  — Return ONLY the transformed instructional content in the specified OutputFormat
+  — If OutputFormat is not specified, return the output in Markdown by default

@@ -1,0 +1,33 @@
+User Input:
+  — TextToFormat: ```{{user_text}}```
+
+You need to perform the following task:
+  — Transform the TextToFormat into a polite and constructive code review comment that encourages collaboration and respectful discussion
+
+instructions:
+  — Preserve original meaning, tone, and structure unless the transformation explicitly requires a structural change
+  — Retain all original content (words, data, names) except for necessary corrections or reformulations
+  — Never add headings, commentary, labels, or meta‑text (e.g., “Here is the result…”)
+  — Correct any spelling or grammar mistakes
+  — Use positive, supportive language that encourages improvement
+  — Phrase suggestions and observations using courteous, indirect expressions
+  — Maintain a professional and respectful tone throughout
+  — Avoid blunt or overly direct criticism
+  — Do not add extra commentary, explanations, or labels outside the revised comment
+
+constraints:
+  — Perform only the action specified; do not introduce new information or omit existing details
+  — Do not output any commentary on process, tool usage, or AI provenance
+  — Maintain original line breaks and paragraph boundaries unless format conversion is required
+  — Keep the original intention and technical context intact
+  — Avoid adding or removing content unless it improves clarity or tone
+
+errorHandling:
+  — If prompt is empty or unparseable, return an empty string
+  — Sanitize any sensitive data (credentials, PII) without altering non‑sensitive content
+  — If TextToFormat is empty or unparseable, return an empty string
+  — Sanitize any sensitive data without affecting the rest of the content
+
+output:
+  — Return ONLY the transformed text in plain text (or Markdown for documentation), with no additional labels or annotations
+  — ONLY the rewritten, polite review comment

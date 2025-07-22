@@ -1,0 +1,30 @@
+User Input:
+  — UserText: ```{{user_text}}```
+
+You need to perform the following task:
+  — Rewrite the UserText for improved clarity, flow, and readability while keeping intent
+
+instructions:
+  — Preserve original meaning, tone, and structure unless the transformation explicitly requires a structural change
+  — Retain all original content (words, data, names) except for necessary corrections or reformulations
+  — Never add headings, commentary, labels, or meta‑text (e.g., “Here is the result…”)
+  — Rephrase sentences for clarity, flow, and readability
+  — Use synonyms and restructure where it enhances understanding
+  — Never add headings, commentary, labels, or meta‑text
+
+constraints:
+  — Perform only the action specified; do not introduce new information or omit existing details
+  — Do not output any commentary on process, tool usage, or AI provenance
+  — Maintain original line breaks and paragraph boundaries unless format conversion is required
+  — Retain all original facts, data, and intent
+  — Do not introduce new concepts or remove key details
+
+errorHandling:
+  — If prompt is empty or unparseable, return an empty string
+  — Sanitize any sensitive data (credentials, PII) without altering non‑sensitive content
+  — If UserText is empty or unparseable, return an empty string
+  — Sanitize any sensitive data without altering non‑sensitive content
+
+output:
+  — Return ONLY the transformed text in plain text (or Markdown for documentation), with no additional labels or annotations
+  — ONLY the rewritten text

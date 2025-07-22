@@ -1,0 +1,29 @@
+User Input:
+  — UserText: ```{{user_text}}```
+
+You need to perform the following task:
+  — Format the UserText into Markdown-based documentation for wikis and Confluence
+
+instructions:
+  — Preserve original meaning, tone, and structure unless the transformation explicitly requires a structural change
+  — Retain all original content (words, data, names) except for necessary corrections or reformulations
+  — Never add headings, commentary, labels, or meta‑text (e.g., “Here is the result…”)
+  — Use Markdown headers, code blocks (```), and inline code (`…`)
+  — Organize into Overview, Details, Examples (only if clarifying), and Notes
+  — Never add meta‑text or extra examples beyond minimal clarification
+
+constraints:
+  — Perform only the action specified; do not introduce new information or omit existing details
+  — Do not output any commentary on process, tool usage, or AI provenance
+  — Maintain original line breaks and paragraph boundaries unless format conversion is required
+  — Omit private/internal details
+
+errorHandling:
+  — If prompt is empty or unparseable, return an empty string
+  — Sanitize any sensitive data (credentials, PII) without altering non‑sensitive content
+  — If UserText is empty or unparseable, return an empty string
+  — Sanitize any sensitive data without altering non‑sensitive content
+
+output:
+  — Return ONLY the transformed text in plain text (or Markdown for documentation), with no additional labels or annotations
+  — ONLY the documentation in Markdown
