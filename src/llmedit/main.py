@@ -3,10 +3,13 @@ import sys
 import time
 from pathlib import Path
 
+from PyQt6.QtWidgets import QApplication
+
 from config.prompts_objects import ID_PROMPT_PROOFREAD_BASE, PROMPT_PARAM_USER_TEXT
 from context import create_context, AppContext
 from core.models.data_types import ProcessingContext, TaskResult, TaskInput
 from core.models.enums.settings import LlmProviderType
+from ui.main_window import MainWindow
 
 
 def configure_logger(log_level: int = logging.INFO) -> None:
@@ -93,10 +96,10 @@ def start_application():
     logger.debug(f"Application root path: {APP_ROOT_PATH}")
     ctx = create_context(APP_ROOT_PATH)
     # testing(ctx)
-    # app = QApplication(sys.argv)
-    # window = MainWindow()
-    # window.show()
-    # sys.exit(app.exec())
+    app = QApplication(sys.argv)
+    window = MainWindow(ctx=ctx)
+    window.show()
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':
