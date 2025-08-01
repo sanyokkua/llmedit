@@ -1,5 +1,7 @@
 import logging
-from typing import List
+from typing import Dict, Mapping, Sequence, Tuple
+
+from typing_extensions import override
 
 from config.prompts_objects import APPLICATION_PROMPTS
 from core.interfaces.prompt.prompt_service import PromptService
@@ -9,87 +11,127 @@ from core.models.enums.prompt import PromptCategory
 logger = logging.getLogger(__name__)
 
 
+class PromptNotFoundError(ValueError):
+    """Raised when a requested prompt ID does not exist."""
+
+
+class PromptValidationError(ValueError):
+    """Raised when parameters for a prompt fail validation."""
+
+
 class AppPromptService(PromptService):
+    """
+    Concrete PromptService using a fixed, in-memory list of application prompts.
+    Public methods override PromptService to provide app-specific behavior.
+    """
+
+    @override
     def get_prompt(self, prompt_id: str) -> Prompt:
-        """Retrieve a specific prompt by ID."""
-        logger.debug("get_prompt: Requesting prompt with id '%s'", prompt_id)
+        """
+        Override: Return the Prompt whose `id` matches `prompt_id`.
+        Raises PromptNotFoundError if no match.
+        """
+        logger.debug("get_prompt: looking up id=%r", prompt_id)
 
-        for app_prompt in APPLICATION_PROMPTS:
-            if app_prompt.id == prompt_id:
-                logger.debug(
-                    "get_prompt: Found prompt '%s' (category: %s)",
-                    app_prompt.id,
-                    app_prompt.category.value
-                )
-                return app_prompt
+        prompt = next((p for p in APPLICATION_PROMPTS if p.id == prompt_id), None)
+        if prompt is None:
+            logger.warning("get_prompt: no prompt for id=%r", prompt_id)
+            raise PromptNotFoundError(f"No prompt with id={prompt_id!r}")
 
-        logger.warning("get_prompt: Prompt not found for id '%s'", prompt_id)
-        raise ValueError(f"Prompt with id '{prompt_id}' not found.")
-
-    def get_prompts_by_category(self, category: PromptCategory) -> List[Prompt]:
-        """Retrieve prompts filtered by category."""
-        logger.debug("[%s] get_prompts_by_category: Requesting category '%s'", __name__, category.value)
-
-        prompts = [p for p in APPLICATION_PROMPTS if p.category == category]
-        logger.info(
-            "get_prompts_by_category: Found %d prompts for category '%s'",
-            len(prompts),
-            category.value
-        )
-        return prompts
-
-    def apply_prompt_parameters(self, prompt: Prompt, parameters: dict[str, str]) -> str:
-        """Apply parameters to a prompt template."""
         logger.debug(
-            "apply_prompt_parameters: Processing prompt '%s' with %d parameters",
+            "get_prompt: found id=%r (category=%s)",
             prompt.id,
-            len(parameters)
+            prompt.category.value,
+        )
+        return prompt
+
+    @override
+    def get_prompts_by_category(self, category: PromptCategory) -> Sequence[Prompt]:
+        """
+        Override: Return all prompts whose `.category` equals the given category.
+        """
+        logger.debug(
+            "get_prompts_by_category: filtering category=%s", category.value,
         )
 
-        is_valid, err = self.validate_prompt_parameters(prompt, parameters)
+        results = [p for p in APPLICATION_PROMPTS if p.category == category]
+
+        logger.info(
+            "get_prompts_by_category: %d found for category=%s",
+            len(results),
+            category.value,
+        )
+        return results
+
+    @override
+    def apply_prompt_parameters(
+        self,
+        prompt: Prompt,
+        parameters: Dict[str, str],
+    ) -> str:
+        """
+        Override: Substitute placeholders in `prompt.template` with values from `parameters`.
+        Raises PromptValidationError if validation fails.
+        """
+        logger.debug(
+            "apply_prompt_parameters: id=%r, params=%s",
+            prompt.id,
+            list(parameters.keys()),
+        )
+
+        # Validate; uses public validate_prompt_parameters
+        is_valid, error = self.validate_prompt_parameters(prompt, parameters)
         if not is_valid:
             logger.error(
-                "apply_prompt_parameters: Validation failed for prompt '%s' - %s",
+                "apply_prompt_parameters: validation failed for id=%r: %s",
                 prompt.id,
-                err
+                error,
             )
-            raise ValueError(err)
+            raise PromptValidationError(error)
 
-        prompt_template = prompt.template
-        for param, value in parameters.items():
-            placeholder = "{{" + param + "}}"
-            prompt_template = prompt_template.replace(placeholder, value)
-            logger.debug(
-                "apply_prompt_parameters: Replaced '%s' with '%s'",
-                placeholder,
-                value
-            )
+        # Perform all replacements
+        filled = self._substitute_placeholders(prompt.template, parameters)
 
-        logger.debug(
-            "apply_prompt_parameters: Final template: '%s'",
-            prompt_template[:100] + "..." if len(prompt_template) > 100 else prompt_template
-        )
-        return prompt_template
+        snippet = filled if len(filled) <= 100 else filled[:100] + "…"
+        logger.debug("apply_prompt_parameters: result=%r", snippet)
+        return filled
 
-    def validate_prompt_parameters(self, prompt: Prompt, parameters: dict[str, str]) -> tuple[bool, str]:
-        """Validate required parameters are present."""
-        logger.debug(
-            "validate_prompt_parameters: Validating %d required parameters for prompt '%s'",
-            len(prompt.parameters),
-            prompt.id
-        )
-
+    @override
+    def validate_prompt_parameters(
+        self,
+        prompt: Prompt,
+        parameters: Dict[str, str],
+    ) -> Tuple[bool, str]:
+        """
+        Override: Validate required parameters are present.
+        Returns (True, "") if valid, otherwise (False, error_message).
+        """
         missing = [p for p in prompt.parameters if p not in parameters]
         if missing:
+            message = f"Missing required parameters: {', '.join(missing)}"
             logger.warning(
-                "validate_prompt_parameters: Missing %d parameters: %s",
-                len(missing),
-                ", ".join(missing)
+                "validate_prompt_parameters: %s", message,
             )
-            return False, f"Missing required parameters: {', '.join(missing)}"
+            return False, message
 
         logger.debug(
-            "validate_prompt_parameters: All %d parameters present",
-            len(prompt.parameters)
+            "validate_prompt_parameters: all %d parameters present for id=%r",
+            len(prompt.parameters),
+            prompt.id,
         )
         return True, ""
+
+    @staticmethod
+    def _substitute_placeholders(
+        template: str,
+        parameters: Mapping[str, str],
+    ) -> str:
+        """
+        Internal: Replace all occurrences of `{{key}}` in `template` with
+        `parameters[key]`.
+        """
+        result = template
+        for key, val in parameters.items():
+            placeholder = f"{{{{{key}}}}}"
+            result = result.replace(placeholder, val)
+        return result

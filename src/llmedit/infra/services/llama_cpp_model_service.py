@@ -1,9 +1,13 @@
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Optional, override
 
-from llama_cpp import Llama, ChatCompletionRequestMessage, ChatCompletionRequestSystemMessage, \
-    ChatCompletionRequestUserMessage
+from llama_cpp import (
+    ChatCompletionRequestMessage,
+    ChatCompletionRequestSystemMessage,
+    ChatCompletionRequestUserMessage,
+    Llama,
+)
 
 from core.interfaces.llm_model.model_service import ModelService
 from core.models.data_types import GenerationRequest, GenerationResponse
@@ -21,24 +25,27 @@ class LlamaCppModelService(ModelService):
         logger.debug(
             "__init__: Initialized for model '%s' (file: '%s')",
             self._model_information.name,
-            self._model_information.fileName
+            self._model_information.fileName,
         )
 
+    @override
     def get_model_information(self) -> ModelInformation:
         """Retrieve model configuration details."""
         logger.debug(
             "get_model_information: Returning model '%s' (provider: %s)",
             self._model_information.name,
-            self._model_information.provider.value
+            self._model_information.provider.value,
         )
         return self._model_information
 
+    @override
     def is_model_loaded(self) -> bool:
         """Check if model is currently loaded in memory."""
         loaded = self._model is not None
         logger.debug("is_model_loaded: Model status: %s", "LOADED" if loaded else "UNLOADED")
         return loaded
 
+    @override
     def load_model(self) -> None:
         """Load model into memory if not already loaded."""
         if self.is_model_loaded():
@@ -49,7 +56,7 @@ class LlamaCppModelService(ModelService):
         logger.debug(
             "load_model: Loading model '%s' from '%s'",
             self._model_information.name,
-            model_path
+            model_path,
         )
 
         try:
@@ -59,20 +66,21 @@ class LlamaCppModelService(ModelService):
                 n_gpu_layers=-1,  # Use GPU for all layers
                 n_threads=8,  # Generation threads
                 use_mlock=True,  # Keep in RAM
-                verbose=False  # Suppress verbose output
+                verbose=False,  # Suppress verbose output
             )
             logger.info(
                 "load_model: Successfully loaded model '%s'",
-                self._model_information.name
+                self._model_information.name,
             )
         except Exception as e:
             logger.error(
                 "load_model: Failed to load model '%s'",
                 self._model_information.name,
-                exc_info=True
+                exc_info=True,
             )
             raise RuntimeError(f"Failed to load model: {str(e)}") from e
 
+    @override
     def unload_model(self) -> None:
         """Unload model from memory if loaded."""
         if not self.is_model_loaded():
@@ -88,17 +96,17 @@ class LlamaCppModelService(ModelService):
             logger.warning(
                 "unload_model: Failed to unload model '%s'",
                 self._model_information.name,
-                e,
                 exc_info=True,
             )
             self._model = None
 
+    @override
     def generate_response(self, request: GenerationRequest) -> GenerationResponse:
         """Generate response using loaded model."""
         if not self.is_model_loaded():
             logger.info(
                 "generate_response: Model not loaded - loading '%s'",
-                self._model_information.name
+                self._model_information.name,
             )
             self.load_model()
 
@@ -110,7 +118,7 @@ class LlamaCppModelService(ModelService):
             request.temperature,
             request.top_k,
             request.top_p,
-            request.min_p
+            request.min_p,
         )
 
         try:
@@ -130,7 +138,7 @@ class LlamaCppModelService(ModelService):
             generated_text = response["choices"][0]["message"]["content"].strip()
             logger.info(
                 "generate_response: Generated %d characters",
-                len(generated_text)
+                len(generated_text),
             )
 
             return GenerationResponse(
@@ -145,6 +153,6 @@ class LlamaCppModelService(ModelService):
             logger.error(
                 "generate_response: Generation failed for model '%s'",
                 self._model_information.name,
-                exc_info=True
+                exc_info=True,
             )
             raise RuntimeError(f"Failed to generate response: {str(e)}") from e

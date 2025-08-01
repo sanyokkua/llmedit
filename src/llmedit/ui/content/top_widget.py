@@ -2,13 +2,7 @@ import logging
 from typing import Optional
 
 from PyQt6.QtCore import pyqtSignal
-from PyQt6.QtWidgets import (
-    QWidget,
-    QHBoxLayout,
-    QLabel,
-    QPushButton,
-    QSizePolicy
-)
+from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSizePolicy, QWidget)
 
 from context import AppContext
 from ui.base_widget import BaseWidget
@@ -24,54 +18,77 @@ class TopBarWidget(BaseWidget):
 
         logger.debug("__init__: Initializing top bar widget")
 
-        self._app_label = QLabel("LLM Edit")
-        self._settings_button = QPushButton("Settings")
-        self._settings_button.clicked.connect(self.settings_clicked)
+        try:
+            self._app_label = QLabel("LLM Edit")
+            self._settings_button = QPushButton("Settings")
+            self._settings_button.clicked.connect(self.settings_clicked)
 
-        logger.debug("__init__: Settings button initialized")
+            logger.debug("__init__: Settings button initialized")
 
-        self._configure_layout()
-        logger.debug(
-            "__init__: Top bar initialized with %d elements",
-            self.layout().count() if self.layout() else 0
-        )
+            self._configure_layout()
+            logger.debug(
+                "__init__: Top bar initialized with %d elements",
+                self.layout().count() if self.layout() else 0,
+            )
+        except Exception as e:
+            logger.error(
+                "__init__: Failed to initialize top bar widget: %s",
+                str(e),
+                exc_info=True,
+            )
+            raise
 
     def _configure_layout(self) -> None:
         """Configure the layout for the top bar."""
-        logger.debug("_configure_layout: Setting up top bar layout")
+        try:
+            logger.debug("_configure_layout: Setting up top bar layout")
 
-        layout = QHBoxLayout()
-        layout.setContentsMargins(12, 6, 12, 6)
-        layout.setSpacing(16)
+            layout = QHBoxLayout()
+            layout.setContentsMargins(12, 6, 12, 6)
+            layout.setSpacing(16)
 
-        layout.addWidget(self._app_label)
-        layout.addStretch()  # Push settings button to right
-        layout.addWidget(self._settings_button)
+            layout.addWidget(self._app_label)
+            layout.addStretch()  # Push settings button to right
+            layout.addWidget(self._settings_button)
 
-        self.setLayout(layout)
-        self.setSizePolicy(
-            QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Fixed
-        )
+            self.setLayout(layout)
+            self.setSizePolicy(
+                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Fixed,
+            )
 
-        logger.debug(
-            "_configure_layout: Layout configured with %d elements",
-            layout.count()
-        )
+            logger.debug(
+                "_configure_layout: Layout configured with %d elements",
+                layout.count(),
+            )
+        except Exception as e:
+            logger.error(
+                "_configure_layout: Failed to configure layout: %s",
+                str(e),
+                exc_info=True,
+            )
+            raise
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
         """Update settings button state based on system readiness."""
-        system_ready = self._ctx.is_system_ready()
-        button_state = "ENABLED" if (system_ready and enabled) else "DISABLED"
+        try:
+            system_ready = self._ctx.is_system_ready()
+            button_state = "ENABLED" if (system_ready and enabled) else "DISABLED"
 
-        logger.debug(
-            "on_widgets_enabled_changed: Settings button set to %s (system_ready=%s, enabled=%s)",
-            button_state,
-            system_ready,
-            enabled
-        )
+            logger.debug(
+                "on_widgets_enabled_changed: Settings button set to %s (system_ready=%s, enabled=%s)",
+                button_state,
+                system_ready,
+                enabled,
+            )
 
-        if not system_ready:
-            self._settings_button.setEnabled(True)
-        else:
-            self._settings_button.setEnabled(enabled)
+            if not system_ready:
+                self._settings_button.setEnabled(True)
+            else:
+                self._settings_button.setEnabled(enabled)
+        except Exception as e:
+            logger.error(
+                "on_widgets_enabled_changed: Failed to change widget enabled state: %s",
+                str(e),
+                exc_info=True,
+            )

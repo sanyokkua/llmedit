@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import Callable
 
-from PyQt6.QtCore import QThreadPool, QObject, pyqtSignal
+from PyQt6.QtCore import QObject, QThreadPool, pyqtSignal
 
 from application.services.default_supported_translation_languages_service import \
     DefaultSupportedTranslationLanguagesService
@@ -40,7 +40,7 @@ class AppContext(QObject):
 
         logger.debug(
             "__init__: Initializing application context with %s settings service",
-            type(settings_service).__name__
+            type(settings_service).__name__,
         )
 
         self._settings_service = settings_service
@@ -83,7 +83,7 @@ class AppContext(QObject):
         """Subscribe to settings update events."""
         logger.debug(
             "subscribe_settings_updated: New listener registered (%s)",
-            listener.__qualname__
+            getattr(listener, '__qualname__', str(listener)),
         )
         self.settings_updated_signal.connect(listener)
 
@@ -99,7 +99,7 @@ class AppContext(QObject):
 
         logger.debug(
             "is_system_ready: System readiness status: %s",
-            "READY" if is_ready else "NOT READY"
+            "READY" if is_ready else "NOT READY",
         )
         return is_ready
 
@@ -108,25 +108,26 @@ def create_settings_service(root_path: Path) -> SettingsService:
     """Create and configure the settings service."""
     logger.debug(
         "create_settings_service: Creating settings service for root path '%s'",
-        root_path
+        root_path,
     )
 
     models_path = root_path / DATA_DIR / DATA_MODELS_SUBDIR
     logger.debug(
         "create_settings_service: Models will be stored at '%s'",
-        models_path
+        models_path,
     )
 
     try:
         models_path.mkdir(parents=True, exist_ok=True)
         logger.debug(
             "create_settings_service: Models directory created (exists=%s)",
-            models_path.exists()
+            models_path.exists(),
         )
     except Exception as e:
-        logger.warning(
-            "create_settings_service: Failed to create models directory",
-            exc_info=True
+        logger.error(
+            "create_settings_service: Failed to create models directory: %s",
+            str(e),
+            exc_info=True,
         )
         raise
 
@@ -136,17 +137,17 @@ def create_settings_service(root_path: Path) -> SettingsService:
     logger.debug(
         "create_settings_service: Settings providers initialized (%s, %s)",
         type(ollama_settings_provider).__name__,
-        type(llamacpp_settings_provider).__name__
+        type(llamacpp_settings_provider).__name__,
     )
 
     settings_service = InMemorySettingsService(
         ollama_provider=ollama_settings_provider,
-        llama_provider=llamacpp_settings_provider
+        llama_provider=llamacpp_settings_provider,
     )
 
     logger.debug(
         "create_settings_service: Settings service created with provider count: %d",
-        len(settings_service.get_llm_provider_list())
+        len(settings_service.get_llm_provider_list()),
     )
     return settings_service
 
@@ -155,47 +156,47 @@ def create_context(root_path: Path) -> AppContext:
     """Create and configure the application context."""
     logger.debug(
         "create_context: Creating application context for root path '%s'",
-        root_path
+        root_path,
     )
 
     try:
         prompt_service = AppPromptService()
         logger.debug(
             "create_context: Prompt service initialized (%s)",
-            type(prompt_service).__name__
+            type(prompt_service).__name__,
         )
 
         text_sanitization_service = ReasoningTextSanitizationService()
         logger.debug(
             "create_context: Text sanitization service initialized (%s)",
-            type(text_sanitization_service).__name__
+            type(text_sanitization_service).__name__,
         )
 
         supported_languages_service = DefaultSupportedTranslationLanguagesService()
         logger.debug(
             "create_context: Languages service initialized with %d supported languages",
-            len(supported_languages_service.get_supported_translation_languages())
+            len(supported_languages_service.get_supported_translation_languages()),
         )
 
         models_path = root_path / DATA_DIR / DATA_MODELS_SUBDIR
         logger.debug(
             "create_context: Using models path '%s'",
-            models_path
+            models_path,
         )
 
         settings_service = create_settings_service(root_path)
         logger.debug(
             "create_context: Settings service created with provider: %s",
-            settings_service.get_llm_provider().value
+            settings_service.get_llm_provider().value,
         )
 
         model_service_provider = StandardModelServiceProvider(
             settings_service=settings_service,
-            model_folder_path=models_path
+            model_folder_path=models_path,
         )
         logger.debug(
             "create_context: Model service provider initialized (%s)",
-            type(model_service_provider).__name__
+            type(model_service_provider).__name__,
         )
 
         text_processing_service = TextProcessingServiceBase(
@@ -206,7 +207,7 @@ def create_context(root_path: Path) -> AppContext:
         )
         logger.debug(
             "create_context: Text processing service initialized (%s)",
-            type(text_processing_service).__name__
+            type(text_processing_service).__name__,
         )
 
         thread_pool = QThreadPool()
@@ -214,7 +215,7 @@ def create_context(root_path: Path) -> AppContext:
         task_service: TaskService = TaskServiceImpl(thread_pool=thread_pool)
         logger.debug(
             "create_context: Task service initialized with max threads=%d",
-            thread_pool.maxThreadCount()
+            thread_pool.maxThreadCount(),
         )
 
         context = AppContext(
@@ -227,13 +228,14 @@ def create_context(root_path: Path) -> AppContext:
 
         logger.info(
             "create_context: Application context created successfully with %d services",
-            5  # Count of services passed to AppContext
+            5,  # Count of services passed to AppContext
         )
         return context
 
     except Exception as e:
         logger.error(
-            "create_context: Failed to create application context",
-            exc_info=True
+            "create_context: Failed to create application context: %s",
+            str(e),
+            exc_info=True,
         )
         raise

@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, override
 
 import ollama
 
@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class SettingsOllamaProvider(SettingsLLMProvider):
+    @override
     def get_model_list(self) -> List[LlmModel]:
         """Retrieve available models from Ollama service."""
         logger.debug("get_model_list: Starting model list retrieval from Ollama")
@@ -35,7 +36,7 @@ class SettingsOllamaProvider(SettingsLLMProvider):
             LlmModel(
                 id=model_name,
                 name=model_name,
-                is_available=True
+                is_available=True,
             ) for model_name in model_names
         ]
 

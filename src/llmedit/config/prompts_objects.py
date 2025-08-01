@@ -1,7 +1,22 @@
-from config.prompts_raw import SYSTEM_PROMPT, FORMAT_CHAT, FORMAT_EMAIL, FORMAT_INSTRUCTION_GUIDE, \
-    FORMAT_PLAIN_DOCUMENT, FORMAT_SOCIAL_MEDIA_POST, FORMAT_WIKI_MARKDOWN, PROOFREAD_BASE, PROOFREAD_REWRITE, \
-    PROOFREAD_CASUAL, PROOFREAD_FORMAL, PROOFREAD_SEMI_FORMAL, PROOFREAD_FRIENDLY, PROOFREAD_PULL_REQUEST_DESCRIPTION, \
-    PROOFREAD_PULL_REQUEST_POLITE, TRANSLATE_BASE, TRANSLATE_DICTIONARY
+from config.prompts_raw import (
+    FORMAT_CHAT,
+    FORMAT_EMAIL,
+    FORMAT_INSTRUCTION_GUIDE,
+    FORMAT_PLAIN_DOCUMENT,
+    FORMAT_SOCIAL_MEDIA_POST,
+    FORMAT_WIKI_MARKDOWN,
+    PROOFREAD_BASE,
+    PROOFREAD_CASUAL,
+    PROOFREAD_FORMAL,
+    PROOFREAD_FRIENDLY,
+    PROOFREAD_PULL_REQUEST_DESCRIPTION,
+    PROOFREAD_PULL_REQUEST_POLITE,
+    PROOFREAD_REWRITE,
+    PROOFREAD_SEMI_FORMAL,
+    SYSTEM_PROMPT,
+    TRANSLATE_BASE,
+    TRANSLATE_DICTIONARY,
+)
 from core.models.data_types import Prompt
 from core.models.enums.prompt import PromptCategory
 
@@ -34,7 +49,7 @@ APPLICATION_PROMPTS = [
         description='Defines the overall behavior, constraints, and capabilities of the assistant.',
         category=PromptCategory.SYSTEM,
         template=SYSTEM_PROMPT,
-        parameters=[]
+        parameters=[],
     ),
 
     Prompt(
@@ -43,7 +58,7 @@ APPLICATION_PROMPTS = [
         description='Formats output for casual, conversational interactions.',
         category=PromptCategory.FORMAT,
         template=FORMAT_CHAT,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -52,7 +67,7 @@ APPLICATION_PROMPTS = [
         description='Structures content to be suitable for professional or personal email communication.',
         category=PromptCategory.FORMAT,
         template=FORMAT_EMAIL,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -61,7 +76,7 @@ APPLICATION_PROMPTS = [
         description='Converts content into a clear, step-by-step instructional format.',
         category=PromptCategory.FORMAT,
         template=FORMAT_INSTRUCTION_GUIDE,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -70,7 +85,7 @@ APPLICATION_PROMPTS = [
         description='Prepares clean, unstyled text suitable for plain documents or internal notes.',
         category=PromptCategory.FORMAT,
         template=FORMAT_PLAIN_DOCUMENT,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -79,7 +94,7 @@ APPLICATION_PROMPTS = [
         description='Adapts content to be engaging and concise for platforms like Twitter, LinkedIn, or Instagram.',
         category=PromptCategory.FORMAT,
         template=FORMAT_SOCIAL_MEDIA_POST,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -88,7 +103,7 @@ APPLICATION_PROMPTS = [
         description='Structures content using wiki-style Markdown for documentation or collaborative platforms.',
         category=PromptCategory.FORMAT,
         template=FORMAT_WIKI_MARKDOWN,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -97,7 +112,7 @@ APPLICATION_PROMPTS = [
         description='Identifies and corrects grammar, spelling, and clarity issues in the text.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_BASE,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -106,7 +121,7 @@ APPLICATION_PROMPTS = [
         description='Rephrases the text while preserving meaning and improving tone or readability.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_REWRITE,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -115,7 +130,7 @@ APPLICATION_PROMPTS = [
         description='Adapts formal or neutral text into a friendly, informal style.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_CASUAL,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -124,7 +139,7 @@ APPLICATION_PROMPTS = [
         description='Elevates the tone of content for professional, academic, or official contexts.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_FORMAL,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -133,7 +148,7 @@ APPLICATION_PROMPTS = [
         description='Balances friendliness with professionalism for versatile communication.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_SEMI_FORMAL,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -142,7 +157,7 @@ APPLICATION_PROMPTS = [
         description='Infuses the text with warmth and approachability.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_FRIENDLY,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -151,7 +166,7 @@ APPLICATION_PROMPTS = [
         description='Refines pull request descriptions to be clear, concise, and informative.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_PULL_REQUEST_DESCRIPTION,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -160,7 +175,7 @@ APPLICATION_PROMPTS = [
         description='Polishes pull request comments for respectful and constructive feedback.',
         category=PromptCategory.PROOFREAD,
         template=PROOFREAD_PULL_REQUEST_POLITE,
-        parameters=[PROMPT_PARAM_USER_TEXT]
+        parameters=[PROMPT_PARAM_USER_TEXT],
     ),
 
     Prompt(
@@ -169,7 +184,7 @@ APPLICATION_PROMPTS = [
         description='Translates text into a target language using natural and fluent phrasing.',
         category=PromptCategory.TRANSLATE,
         template=TRANSLATE_BASE,
-        parameters=[PROMPT_PARAM_USER_TEXT, PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE]
+        parameters=[PROMPT_PARAM_USER_TEXT, PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE],
     ),
 
     Prompt(
@@ -178,6 +193,6 @@ APPLICATION_PROMPTS = [
         description='Provides word-for-word translations with contextual definitions.',
         category=PromptCategory.TRANSLATE,
         template=TRANSLATE_DICTIONARY,
-        parameters=[PROMPT_PARAM_USER_TEXT, PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE]
+        parameters=[PROMPT_PARAM_USER_TEXT, PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE],
     ),
 ]

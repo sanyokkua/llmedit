@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Callable, Any, Optional
+from typing import Any, Callable, List, Optional
 
 from core.models.enums.prompt import PromptCategory
 
@@ -33,8 +33,8 @@ class GenerationRequest:
 @dataclass(frozen=True)
 class GenerationResponse:
     text_content: str
-    metadata: dict[str, str]
     original_request: GenerationRequest
+    metadata: dict[str, str]
 
 
 @dataclass(frozen=True)

@@ -1,4 +1,5 @@
 import logging
+from typing import override
 
 import ollama
 
@@ -14,22 +15,24 @@ class OllamaModelService(ModelService):
         self._model_information = model_information
         logger.debug(
             "__init__: Initialized for Ollama model '%s'",
-            self._model_information.name
+            self._model_information.name,
         )
 
+    @override
     def get_model_information(self) -> ModelInformation:
         """Retrieve model configuration details."""
         logger.debug(
             "get_model_information: Returning model '%s'",
-            self._model_information.name
+            self._model_information.name,
         )
         return self._model_information
 
+    @override
     def is_model_loaded(self) -> bool:
         """Check if model is available in Ollama."""
         logger.debug(
             "is_model_loaded: Checking availability of model '%s'",
-            self._model_information.name
+            self._model_information.name,
         )
 
         try:
@@ -41,30 +44,32 @@ class OllamaModelService(ModelService):
                 "is_model_loaded: Model '%s' availability: %s (found in %d models)",
                 self._model_information.name,
                 "AVAILABLE" if is_available else "NOT AVAILABLE",
-                len(model_names)
+                len(model_names),
             )
             return is_available
 
         except Exception as e:
             logger.warning(
                 "is_model_loaded: Failed to check model availability",
-                e,
-                exc_info=True
+                exc_info=True,
             )
             return False
 
+    @override
     def load_model(self) -> None:
         """No-op for Ollama (models managed externally)."""
         logger.debug(
-            "load_model: No-op for Ollama (model loading handled externally)"
+            "load_model: No-op for Ollama (model loading handled externally)",
         )
 
+    @override
     def unload_model(self) -> None:
         """No-op for Ollama (models managed externally)."""
         logger.debug(
-            "unload_model: No-op for Ollama (model unloading handled externally)"
+            "unload_model: No-op for Ollama (model unloading handled externally)",
         )
 
+    @override
     def generate_response(self, request: GenerationRequest) -> GenerationResponse:
         """Generate response using Ollama API."""
         logger.debug(
@@ -72,20 +77,20 @@ class OllamaModelService(ModelService):
             self._model_information.name,
             len(request.system_prompt),
             len(request.user_prompt),
-            request.temperature
+            request.temperature,
         )
 
         try:
             messages = [
-                {"role": "system", "content": request.system_prompt},
-                {"role": "user", "content": request.user_prompt}
+                { "role": "system", "content": request.system_prompt },
+                { "role": "user", "content": request.user_prompt }
             ]
 
             # Generate response using Ollama
             response = ollama.chat(
                 model=self._model_information.name,
                 messages=messages,
-                options={"temperature": request.temperature}
+                options={ "temperature": request.temperature },
             )
 
             generated_text = response["message"]["content"].strip()
@@ -94,7 +99,7 @@ class OllamaModelService(ModelService):
             logger.info(
                 "generate_response: Generated %d characters for model '%s'",
                 char_count,
-                self._model_information.name
+                self._model_information.name,
             )
 
             return GenerationResponse(
@@ -110,7 +115,6 @@ class OllamaModelService(ModelService):
             logger.error(
                 "generate_response: Generation failed for model '%s'",
                 self._model_information.name,
-                e,
-                exc_info=True
+                exc_info=True,
             )
             raise RuntimeError(f"Failed to generate response: {str(e)}") from e

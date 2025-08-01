@@ -1,11 +1,7 @@
 import logging
 from typing import Optional
 
-from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QSizePolicy, QDialog
-)
+from PyQt6.QtWidgets import (QDialog, QSizePolicy, QVBoxLayout, QWidget)
 
 from context import AppContext
 from ui.base_widget import BaseWidget
@@ -33,7 +29,7 @@ class MainWidget(BaseWidget):
 
         logger.debug(
             "__init__: Created %d main components",
-            sum(1 for _ in [self._top_widget, self._center_widget, self._bottom_widget])
+            sum(1 for _ in [self._top_widget, self._center_widget, self._bottom_widget]),
         )
 
         layout.addWidget(self._top_widget)
@@ -43,66 +39,101 @@ class MainWidget(BaseWidget):
         self.setLayout(layout)
         self.setSizePolicy(
             QSizePolicy.Policy.Expanding,
-            QSizePolicy.Policy.Expanding
+            QSizePolicy.Policy.Expanding,
         )
 
+        # Connect signals
         self._top_widget.settings_clicked.connect(self._on_settings_clicked)
         logger.debug("__init__: Connected settings clicked signal")
 
         self.on_widget_initialization_complete()
         logger.debug(
             "__init__: Main widget initialized with %d layout elements",
-            layout.count()
+            layout.count(),
         )
 
     def _on_settings_clicked(self) -> None:
         """Handle settings button click event."""
         logger.debug("_on_settings_clicked: Opening settings dialog")
 
-        settings = SettingsDialog(self._ctx)
-        result = settings.exec()
+        # Use context manager for proper dialog cleanup
+        settings_dialog = None
+        try:
+            settings_dialog = SettingsDialog(self._ctx)
+            result = settings_dialog.exec()
 
-        # If OK was clicked, process the settings
-        if result == QDialog.DialogCode.Accepted:
-            logger.debug("_on_settings_clicked: Settings dialog accepted - applying changes")
-            self._ctx.emit_settings_updated()
-        else:
-            logger.debug("_on_settings_clicked: Settings dialog canceled")
+            # If OK was clicked, process the settings
+            if result == QDialog.DialogCode.Accepted:
+                logger.debug("_on_settings_clicked: Settings dialog accepted - applying changes")
+                self._ctx.emit_settings_updated()
+            else:
+                logger.debug("_on_settings_clicked: Settings dialog canceled")
+        except Exception as e:
+            logger.error(
+                "_on_settings_clicked: Failed to open settings dialog: %s",
+                str(e),
+                exc_info=True,
+            )
+        finally:
+            # Ensure the dialog is properly cleaned up
+            if settings_dialog:
+                settings_dialog.deleteLater()
 
     def on_settings_updated(self) -> None:
         """Handle settings update events."""
-        settings = self._ctx.settings_service.get_settings_state()
-        logger.debug(
-            "on_settings_updated: Settings updated - provider=%s, model=%s",
-            settings.llm_provider.value,
-            settings.llm_model_name or "None"
-        )
+        try:
+            settings = self._ctx.settings_service.get_settings_state()
+            logger.debug(
+                "on_settings_updated: Settings updated - provider=%s, model=%s",
+                settings.llm_provider.value,
+                settings.llm_model_name or "None",
+            )
 
-        self._bottom_widget.set_model(settings.llm_model_name)
-        self._bottom_widget.set_provider(str(settings.llm_provider.value))
+            self._bottom_widget.set_model(settings.llm_model_name)
+            self._bottom_widget.set_provider(str(settings.llm_provider.value))
+        except Exception as e:
+            logger.error(
+                "on_settings_updated: Failed to update settings display: %s",
+                str(e),
+                exc_info=True,
+            )
 
     def on_system_ready_changed(self, is_ready: bool) -> None:
         """Handle system readiness state changes."""
-        status = "READY" if is_ready else "NOT READY"
-        logger.debug(
-            "on_system_ready_changed: System state changed to %s",
-            status
-        )
+        try:
+            status = "READY" if is_ready else "NOT READY"
+            logger.debug(
+                "on_system_ready_changed: System state changed to %s",
+                status,
+            )
 
-        if not is_ready:
-            self._bottom_widget.set_initialization_status("No Model Selected")
-        else:
-            self._bottom_widget.set_initialization_status("")
+            if not is_ready:
+                self._bottom_widget.set_initialization_status("No Model Selected")
+            else:
+                self._bottom_widget.set_initialization_status("")
+        except Exception as e:
+            logger.error(
+                "on_system_ready_changed: Failed to update system readiness display: %s",
+                str(e),
+                exc_info=True,
+            )
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
         """Handle widget enabled state changes."""
-        state = "ENABLED" if enabled else "DISABLED"
-        logger.debug(
-            "on_widgets_enabled_changed: Main widget state changed to %s",
-            state
-        )
+        try:
+            state = "ENABLED" if enabled else "DISABLED"
+            logger.debug(
+                "on_widgets_enabled_changed: Main widget state changed to %s",
+                state,
+            )
 
-        if enabled:
-            self._bottom_widget.set_background_task_status("")
-        else:
-            self._bottom_widget.set_background_task_status("Running tasks...")
+            if enabled:
+                self._bottom_widget.set_background_task_status("")
+            else:
+                self._bottom_widget.set_background_task_status("Running tasks...")
+        except Exception as e:
+            logger.error(
+                "on_widgets_enabled_changed: Failed to update widget enabled state display: %s",
+                str(e),
+                exc_info=True,
+            )

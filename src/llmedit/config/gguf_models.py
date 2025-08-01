@@ -12,7 +12,7 @@ PREDEFINED_GGUF_MODELS = [
         min_p=0.05,
         system_prompt_prefix='<｜System｜>',
         user_prompt_prefix='<｜User｜>',
-        user_prompt_suffix='<｜Assistant｜>'
+        user_prompt_suffix='<｜Assistant｜>',
     ),
     ModelInformation(
         name='Qwen3-8B (Reasoning)',
@@ -42,7 +42,7 @@ PREDEFINED_GGUF_MODELS = [
         temperature=0.6,
         top_k=20,
         top_p=0.95,
-        user_prompt_suffix='/think'
+        user_prompt_suffix='/think',
 
     ),
     ModelInformation(
@@ -53,7 +53,7 @@ PREDEFINED_GGUF_MODELS = [
         temperature=0.7,
         top_k=20,
         top_p=0.8,
-        user_prompt_suffix='/no_think'
+        user_prompt_suffix='/no_think',
     ),
     ModelInformation(
         name='Qwen3-30B-A3B-Instruct-2507',

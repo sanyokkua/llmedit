@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List
+from typing import List, Optional
 
 from core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
 from core.models.enums.settings import LlmProviderType
-from core.models.settings import SettingsState, LlmModel
+from core.models.settings import LlmModel, SettingsState
 
 
 class SettingsService(ABC):
     def __init__(self,
                  llama_provider: SettingsLLMProvider,
-                 ollama_provider: SettingsLLMProvider):
+                 ollama_provider: SettingsLLMProvider,
+                 ):
         self._llama_provider = llama_provider
         self._ollama_provider = ollama_provider
 

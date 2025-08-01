@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from core.models.data_types import GenerationResponse, GenerationRequest
+from core.models.data_types import GenerationRequest, GenerationResponse
 from core.models.settings import ModelInformation
 
 

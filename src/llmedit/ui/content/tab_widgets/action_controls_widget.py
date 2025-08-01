@@ -1,11 +1,17 @@
 import logging
 from dataclasses import dataclass
-from typing import List, Optional, Dict, Callable as CallableType
+from typing import Callable as CallableType, Dict, List, Optional
 
-from PyQt6.QtCore import pyqtSignal, Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
-    QWidget, QScrollArea, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QPushButton, QSizePolicy, QComboBox
+    QComboBox,
+    QGridLayout,
+    QHBoxLayout,
+    QPushButton,
+    QScrollArea,
+    QSizePolicy,
+    QVBoxLayout,
+    QWidget,
 )
 
 from context import AppContext
@@ -31,18 +37,19 @@ class ActionControlsWidget(BaseWidget):
                  prompts: List[Prompt],
                  input_dropdown_items: Optional[List[str]] = None,
                  output_dropdown_items: Optional[List[str]] = None,
-                 parent=None):
+                 parent=None,
+                 ):
         super().__init__(ctx, parent)
 
         # Log initialization with key metrics
         logger.debug(
             "__init__: Initializing with %d prompts, dropdowns=%s",
             len(prompts),
-            "enabled" if (input_dropdown_items and output_dropdown_items) else "disabled"
+            "enabled" if (input_dropdown_items and output_dropdown_items) else "disabled",
         )
 
         self._prompts = prompts
-        self._buttons: Dict[str, QPushButton] = {}
+        self._buttons: Dict[str, QPushButton] = { }
 
         # Top-level layout
         main_layout = QVBoxLayout(self)
@@ -55,7 +62,7 @@ class ActionControlsWidget(BaseWidget):
             logger.debug(
                 "__init__: Adding dropdowns with %d input and %d output items",
                 len(input_dropdown_items or []),
-                len(output_dropdown_items or [])
+                len(output_dropdown_items or []),
             )
 
             dropdown_layout = QHBoxLayout()
@@ -66,7 +73,7 @@ class ActionControlsWidget(BaseWidget):
             self._input_dropdown.setPlaceholderText("Input")
             self._input_dropdown.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Fixed
+                QSizePolicy.Policy.Fixed,
             )
             for item in input_dropdown_items or []:
                 self._input_dropdown.addItem(item)
@@ -77,7 +84,7 @@ class ActionControlsWidget(BaseWidget):
             self._output_dropdown.setPlaceholderText("Output")
             self._output_dropdown.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Fixed
+                QSizePolicy.Policy.Fixed,
             )
             for item in output_dropdown_items or []:
                 self._output_dropdown.addItem(item)
@@ -93,10 +100,10 @@ class ActionControlsWidget(BaseWidget):
         self._scroll_area = QScrollArea()
         self._scroll_area.setWidgetResizable(True)
         self._scroll_area.setVerticalScrollBarPolicy(
-            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff,
         )
         self._scroll_area.setHorizontalScrollBarPolicy(
-            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff,
         )
         main_layout.addWidget(self._scroll_area, stretch=1)
 
@@ -114,7 +121,7 @@ class ActionControlsWidget(BaseWidget):
             btn.setToolTip(prompt.description)
             btn.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Fixed
+                QSizePolicy.Policy.Fixed,
             )
             btn.setProperty("action_id", prompt.id)
             event = ActionEvent(
@@ -123,61 +130,98 @@ class ActionControlsWidget(BaseWidget):
                 input_dropdown_item=self.input_dropdown_value,
                 output_dropdown_item=self.output_dropdown_value,
             )
-            btn.clicked.connect(lambda _, e=event: self.button_clicked.emit(e))
+            btn.clicked.connect(lambda checked, e=event: self.button_clicked.emit(e))
             self._buttons[prompt.id] = btn
 
         # Initial layout
         self._relayout_buttons()
 
     def input_dropdown_value(self) -> str:
-        value = self._input_dropdown.currentText() if self._input_dropdown else ""
-        logger.debug("input_dropdown_value: Returning '%s'", value)
-        return value
+        try:
+            value = self._input_dropdown.currentText() if self._input_dropdown else ""
+            logger.debug("input_dropdown_value: Returning '%s'", value)
+            return value
+        except Exception as e:
+            logger.error(
+                "input_dropdown_value: Failed to get input dropdown value: %s",
+                str(e),
+                exc_info=True,
+            )
+            return ""
 
     def output_dropdown_value(self) -> str:
-        value = self._output_dropdown.currentText() if self._output_dropdown else ""
-        logger.debug("output_dropdown_value: Returning '%s'", value)
-        return value
+        try:
+            value = self._output_dropdown.currentText() if self._output_dropdown else ""
+            logger.debug("output_dropdown_value: Returning '%s'", value)
+            return value
+        except Exception as e:
+            logger.error(
+                "output_dropdown_value: Failed to get output dropdown value: %s",
+                str(e),
+                exc_info=True,
+            )
+            return ""
 
     def resizeEvent(self, event):
-        super().resizeEvent(event)
-        logger.debug("resizeEvent: Widget resized to %dx%d", self.width(), self.height())
-        self._relayout_buttons()
+        try:
+            super().resizeEvent(event)
+            logger.debug("resizeEvent: Widget resized to %dx%d", self.width(), self.height())
+            self._relayout_buttons()
+        except Exception as e:
+            logger.error(
+                "resizeEvent: Failed to handle resize event: %s",
+                str(e),
+                exc_info=True,
+            )
 
     def _relayout_buttons(self):
-        logger.debug("_relayout_buttons: Rearranging %d buttons", len(self._buttons))
+        try:
+            logger.debug("_relayout_buttons: Rearranging %d buttons", len(self._buttons))
 
-        # Clear existing widgets
-        while self._grid.count() > 0:
-            item = self._grid.takeAt(0)
-            if item and item.widget():
-                self._grid.removeWidget(item.widget())
+            # Clear existing widgets
+            while self._grid.count() > 0:
+                item = self._grid.takeAt(0)
+                if item and item.widget():
+                    self._grid.removeWidget(item.widget())
 
-        # Fixed number of columns
-        cols = 4
+            # Fixed the number of columns
+            cols = 4
 
-        # Place buttons in grid, stretched to column width
-        for idx, btn in enumerate(self._buttons.values()):
-            row = idx // cols
-            col = idx % cols
-            self._grid.addWidget(btn, row, col)
-            # Make sure each button expands to fill its column
-            self._grid.setColumnStretch(col, 1)
+            # Place buttons in a grid, stretched to column width
+            for idx, btn in enumerate(self._buttons.values()):
+                row = idx // cols
+                col = idx % cols
+                self._grid.addWidget(btn, row, col)
+                # Make sure each button expands to fill its column
+                self._grid.setColumnStretch(col, 1)
 
-        logger.debug(
-            "_relayout_buttons: Arranged into %d rows (%d columns)",
-            (len(self._buttons) + cols - 1) // cols,
-            cols
-        )
+            logger.debug(
+                "_relayout_buttons: Arranged into %d rows (%d columns)",
+                (len(self._buttons) + cols - 1) // cols,
+                cols,
+            )
+        except Exception as e:
+            logger.error(
+                "_relayout_buttons: Failed to relayout buttons: %s",
+                str(e),
+                exc_info=True,
+            )
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
-        state = "ENABLED" if enabled else "DISABLED"
-        logger.debug("on_widgets_enabled_changed: Setting widget state to %s", state)
+        try:
+            state = "ENABLED" if enabled else "DISABLED"
+            logger.debug("on_widgets_enabled_changed: Setting widget state to %s", state)
 
-        buttons = self._buttons.values()
-        for btn in buttons:
-            btn.setEnabled(enabled)
-        if self._input_dropdown:
-            self._input_dropdown.setEnabled(enabled)
-        if self._output_dropdown:
-            self._output_dropdown.setEnabled(enabled)
+            buttons = self._buttons.values()
+            for btn in buttons:
+                btn.setEnabled(enabled)
+            if self._input_dropdown:
+                self._input_dropdown.setEnabled(enabled)
+            if self._output_dropdown:
+                self._output_dropdown.setEnabled(enabled)
+        except Exception as e:
+            logger.error(
+                "on_widgets_enabled_changed: Failed to change widget enabled state: %s",
+                str(e),
+                exc_info=True,
+            )

@@ -1,7 +1,5 @@
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QFormLayout, QLabel, QComboBox, QSlider, QCheckBox, QDialogButtonBox
-)
+from PyQt6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout, QLabel, QSlider, QVBoxLayout)
 
 from context import AppContext
 from core.interfaces.settings.settings_service import SettingsService
@@ -76,14 +74,13 @@ class SettingsDialog(QDialog):
     def _reload_models(self):
         # clear
         self.model_combo.clear()
-        provider = self.provider_combo.currentData()
         models = self._settings_service.get_llm_models_for_selected_provider()
         for m in models:
             self.model_combo.addItem(m.name, m.name)
         # allow empty
         self.model_combo.insertItem(0, "", None)
 
-    def _on_provider_changed(self, index: int):
+    def _on_provider_changed(self):
         new_provider: LlmProviderType = self.provider_combo.currentData()
         self._settings_service.set_llm_provider(new_provider)
         # reload models
