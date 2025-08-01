@@ -6,6 +6,11 @@ from core.models.enums.settings import LlmProviderType
 
 @dataclass(frozen=True)
 class SettingsState:
+    """
+    Immutable data class representing the complete state of application settings.
+
+    Captures all configurable LLM-related options at a point in time.
+    """
     llm_provider: LlmProviderType
     llm_model_name: Optional[str]
     llm_temperature: float
@@ -14,6 +19,11 @@ class SettingsState:
 
 @dataclass(frozen=True)
 class LlmModel:
+    """
+    Immutable data class representing a language model available in the system.
+
+    Contains model identity and availability status. Used in UI selection components.
+    """
     id: str
     name: str
     is_available: bool = False
@@ -21,6 +31,12 @@ class LlmModel:
 
 @dataclass(frozen=True)
 class ModelInformation:
+    """
+    Immutable data class containing configuration and metadata for a language model.
+
+    Includes model source, generation parameters, formatting rules, and provider information.
+    Serves as a blueprint for model loading and prompt formatting.
+    """
     name: str
     repositoryId: str = ''
     fileName: str = ''

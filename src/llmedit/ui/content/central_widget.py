@@ -16,7 +16,29 @@ logger = logging.getLogger(__name__)
 
 
 class CentralWidget(BaseWidget):
+    """
+    Central application widget combining text input/output areas with action tabs.
+
+    Serves as the main content area, coordinating user input, action triggering,
+    and task execution. Handles the full processing pipeline from button click
+    to result display.
+    """
+
     def __init__(self, ctx: AppContext, parent: Optional[QWidget] = None) -> None:
+        """
+        Initialize the central widget.
+
+        Args:
+            ctx: Application context providing access to services and state.
+            parent: Optional parent widget.
+
+        Raises:
+            Exception: If widget initialization fails due to component creation or connection errors.
+
+        Notes:
+            Creates and arranges the text interaction areas and action tabs.
+            Connects action button clicks to processing logic.
+        """
         super().__init__(ctx, parent)
 
         logger.debug("__init__: Initializing central widget")
@@ -38,7 +60,7 @@ class CentralWidget(BaseWidget):
 
             logger.debug(
                 "__init__: Central widget initialized with %d text areas and %d tabs",
-                2,  # Input and output text areas
+                2,
                 self._tabs.count(),
             )
         except Exception as e:
@@ -50,7 +72,15 @@ class CentralWidget(BaseWidget):
             raise
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
-        """Update widget state based on system readiness."""
+        """
+        Update widget enabled state based on system readiness.
+
+        Args:
+            enabled: True to enable the widget, False to disable.
+
+        Notes:
+            Used to prevent interaction during processing or when system is not ready.
+        """
         try:
             state = "ENABLED" if enabled else "DISABLED"
             logger.debug(
@@ -66,7 +96,17 @@ class CentralWidget(BaseWidget):
             )
 
     def _on_action_btn_clicked(self, action: ActionEvent) -> None:
-        """Handle action button click events."""
+        """
+        Handle action button click events from the action tabs.
+
+        Args:
+            action: The action event containing prompt and parameter information.
+
+        Notes:
+            Validates system readiness and input text before submitting task.
+            Shows appropriate warnings if conditions are not met.
+            Submits processing task via task service with closure that builds context.
+        """
         try:
             logger.debug(
                 "_on_action_btn_clicked: Button '%s' clicked (prompt: '%s')",
@@ -74,7 +114,6 @@ class CentralWidget(BaseWidget):
                 action.prompt.name,
             )
 
-            # Check system readiness
             system_ready = self._ctx.is_system_ready()
             task_busy = self._ctx.task_service.is_busy()
 
@@ -104,7 +143,6 @@ class CentralWidget(BaseWidget):
                 )
                 return
 
-            # Prepare task execution
             logger.debug(
                 "_on_action_btn_clicked: Preparing task '%s' execution",
                 action.action_id,
@@ -117,7 +155,6 @@ class CentralWidget(BaseWidget):
                         action.action_id,
                     )
 
-                    # Build prompt parameters
                     prompt_parameters = {
                         PROMPT_PARAM_USER_TEXT: self._text_widget.input_text(),
                     }
@@ -138,7 +175,6 @@ class CentralWidget(BaseWidget):
                         )
                         prompt_parameters[PROMPT_PARAM_OUTPUT_LANGUAGE] = output_lang
 
-                    # Create processing context
                     process_ctx = ProcessingContext(
                         user_prompt_id=action.prompt.id,
                         prompt_parameters=prompt_parameters,
@@ -159,7 +195,6 @@ class CentralWidget(BaseWidget):
                     )
                     raise
 
-            # Submit task
             task = TaskInput(
                 id=action.action_id,
                 task_func=closure,
@@ -180,7 +215,16 @@ class CentralWidget(BaseWidget):
 
     @staticmethod
     def _show_warning_message(title: str, message: str) -> None:
-        """Show a warning message dialog."""
+        """
+        Display a modal warning message to the user.
+
+        Args:
+            title: Dialog window title.
+            message: Warning text to display.
+
+        Notes:
+            Uses QMessageBox with warning icon and OK button.
+        """
         try:
             msg_box = QMessageBox()
             msg_box.setWindowTitle(title)
@@ -197,7 +241,16 @@ class CentralWidget(BaseWidget):
             )
 
     def _on_task_finished(self, task_result: TaskResult) -> None:
-        """Handle task completion events."""
+        """
+        Handle completion of a processing task.
+
+        Args:
+            task_result: The result of the completed task.
+
+        Notes:
+            Displays success by updating output text, or shows error dialog on failure.
+            Logs detailed information about task outcome.
+        """
         try:
             if task_result.has_error:
                 logger.error(
@@ -230,7 +283,16 @@ class CentralWidget(BaseWidget):
 
     @staticmethod
     def _show_error_message(title: str, message: str) -> None:
-        """Show an error message dialog."""
+        """
+        Display a modal error message to the user.
+
+        Args:
+            title: Dialog window title.
+            message: Error text to display.
+
+        Notes:
+            Uses QErrorMessage for consistent error presentation.
+        """
         try:
             error_dialog = QtWidgets.QErrorMessage()
             error_dialog.showMessage(message)
@@ -244,7 +306,15 @@ class CentralWidget(BaseWidget):
             )
 
     def set_output_text(self, text: str) -> None:
-        """Set the output text in the text interaction area."""
+        """
+        Set the text in the output area.
+
+        Args:
+            text: The text to display in the output widget.
+
+        Notes:
+            Delegates to the internal text interaction widget.
+        """
         try:
             logger.debug(
                 "set_output_text: Displaying %d characters in output area",

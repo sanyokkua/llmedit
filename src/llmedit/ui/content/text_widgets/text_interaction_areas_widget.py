@@ -19,7 +19,31 @@ logger = logging.getLogger(__name__)
 
 
 class TextInteractionAreasWidget(BaseWidget):
+    """
+    Widget providing side-by-side input and output text areas with clipboard controls.
+
+    Features include:
+    - Input area with paste button to import text from clipboard
+    - Output area with copy button to export text to clipboard
+    - Read-only output display with rich text disabled
+    - Responsive layout with labeled sections
+    """
+
     def __init__(self, ctx: AppContext, parent: Optional[QWidget] = None) -> None:
+        """
+        Initialize the text interaction widget.
+
+        Args:
+            ctx: Application context for shared services.
+            parent: Optional parent widget.
+
+        Raises:
+            Exception: If widget initialization fails due to Qt errors or resource issues.
+
+        Notes:
+            Creates two sections (Input and Output) each with header, action button,
+            and text area. Connects clipboard buttons to their respective handlers.
+        """
         super().__init__(ctx, parent)
 
         logger.debug("__init__: Initializing text interaction areas")
@@ -28,8 +52,14 @@ class TextInteractionAreasWidget(BaseWidget):
             self._input_header = QLabel("Input")
             self._input_header.setStyleSheet("font-weight: bold;")
 
+            self._clear_button = QToolButton()
+            self._clear_button.setText("Clear")
+            self._clear_button.setToolTip("Clear input text area")
+            self._clear_button.clicked.connect(self._clear_input)
+            logger.debug("__init__: Clear button initialized")
+
             self._paste_button = QToolButton()
-            self._paste_button.setText("📋 Paste")
+            self._paste_button.setText("Paste")
             self._paste_button.setToolTip("Paste text from clipboard")
             self._paste_button.clicked.connect(self._paste_from_clipboard)
             logger.debug("__init__: Paste button initialized")
@@ -46,7 +76,7 @@ class TextInteractionAreasWidget(BaseWidget):
             self._output_header.setStyleSheet("font-weight: bold;")
 
             self._copy_button = QToolButton()
-            self._copy_button.setText("📋 Copy")
+            self._copy_button.setText("Copy")
             self._copy_button.setToolTip("Copy text to clipboard")
             self._copy_button.clicked.connect(self._copy_to_clipboard)
             logger.debug("__init__: Copy button initialized")
@@ -64,15 +94,14 @@ class TextInteractionAreasWidget(BaseWidget):
             layout.setContentsMargins(8, 8, 8, 8)
             layout.setSpacing(8)
 
-            # Input area layout
             input_layout = self._create_section_layout(
                 self._input_header,
                 self._paste_button,
                 self._input_text,
+                self._clear_button,
             )
             layout.addLayout(input_layout)
 
-            # Output area layout
             output_layout = self._create_section_layout(
                 self._output_header,
                 self._copy_button,
@@ -93,7 +122,22 @@ class TextInteractionAreasWidget(BaseWidget):
             raise
 
     @staticmethod
-    def _create_section_layout(header: QLabel, action_button: QToolButton, text_area: QTextEdit) -> QVBoxLayout:
+    def _create_section_layout(header: QLabel, action_button: QToolButton, text_area: QTextEdit, clear_button: Optional[QToolButton] = None) -> QVBoxLayout:
+        """
+        Create a labeled section with header, action button, and text area.
+
+        Args:
+            header: Label for the section (e.g., "Input", "Output").
+            clear_button: Button for clearing text.
+            action_button: Button for clipboard operations.
+            text_area: QTextEdit for text input/output.
+
+        Returns:
+            QVBoxLayout containing the assembled section.
+
+        Raises:
+            Exception: If layout creation fails.
+        """
         try:
             logger.debug("_create_section_layout: Creating text section")
 
@@ -101,14 +145,14 @@ class TextInteractionAreasWidget(BaseWidget):
             section_layout.setContentsMargins(0, 0, 0, 0)
             section_layout.setSpacing(4)
 
-            # Header row
             header_layout = QHBoxLayout()
             header_layout.addWidget(header)
             header_layout.addStretch()
+            if clear_button:
+                header_layout.addWidget(clear_button)
             header_layout.addWidget(action_button)
             section_layout.addLayout(header_layout)
 
-            # Text area
             section_layout.addWidget(text_area)
 
             logger.debug(
@@ -124,8 +168,21 @@ class TextInteractionAreasWidget(BaseWidget):
             )
             raise
 
+    def _clear_input(self) -> None:
+        """
+        Clear the input text area.
+        """
+        logger.debug("_clear_input: Clear operation started")
+        self.set_input_text("")
+        logger.debug("_clear_input: Cleared input text area")
+
     def _paste_from_clipboard(self) -> None:
-        """Paste text from system clipboard into input area."""
+        """
+        Paste text from system clipboard into the input text area.
+
+        Notes:
+            Only plain text is pasted. Logs the operation and handles empty clipboard.
+        """
         try:
             logger.debug("_paste_from_clipboard: Paste operation started")
 
@@ -147,7 +204,12 @@ class TextInteractionAreasWidget(BaseWidget):
             )
 
     def _copy_to_clipboard(self) -> None:
-        """Copy text from output area to system clipboard."""
+        """
+        Copy text from output area to system clipboard.
+
+        Notes:
+            Only plain text is copied. Logs the operation and handles empty content.
+        """
         try:
             logger.debug("_copy_to_clipboard: Copy operation started")
 
@@ -169,6 +231,15 @@ class TextInteractionAreasWidget(BaseWidget):
             )
 
     def set_input_text(self, text: str) -> None:
+        """
+        Set the text in the input area.
+
+        Args:
+            text: The text to display in the input QTextEdit.
+
+        Notes:
+            Replaces all existing content. Logs the character count.
+        """
         try:
             logger.debug(
                 "set_input_text: Setting %d characters in input area",
@@ -183,6 +254,15 @@ class TextInteractionAreasWidget(BaseWidget):
             )
 
     def input_text(self) -> str:
+        """
+        Get the current text from the input area.
+
+        Returns:
+            The plain text content of the input QTextEdit.
+
+        Notes:
+            Returns empty string if retrieval fails.
+        """
         try:
             text = self._input_text.toPlainText()
             logger.debug(
@@ -199,6 +279,15 @@ class TextInteractionAreasWidget(BaseWidget):
             return ""
 
     def set_output_text(self, text: str) -> None:
+        """
+        Set the text in the output area.
+
+        Args:
+            text: The text to display in the output QTextEdit.
+
+        Notes:
+            Replaces all existing content. Logs the character count.
+        """
         try:
             logger.debug(
                 "set_output_text: Setting %d characters in output area",
@@ -213,6 +302,15 @@ class TextInteractionAreasWidget(BaseWidget):
             )
 
     def output_text(self) -> str:
+        """
+        Get the current text from the output area.
+
+        Returns:
+            The plain text content of the output QTextEdit.
+
+        Notes:
+            Returns empty string if retrieval fails.
+        """
         try:
             text = self._output_text.toPlainText()
             logger.debug(
@@ -229,6 +327,16 @@ class TextInteractionAreasWidget(BaseWidget):
             return ""
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
+        """
+        Update the enabled state of all contained widgets.
+
+        Args:
+            enabled: True to enable all widgets, False to disable.
+
+        Notes:
+            Affects both text areas and clipboard buttons. Used to prevent interaction
+            during processing or when context is not ready.
+        """
         try:
             state = "ENABLED" if enabled else "DISABLED"
             logger.debug(

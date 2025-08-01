@@ -14,7 +14,26 @@ logger = logging.getLogger(__name__)
 
 
 class MainWidget(BaseWidget):
+    """
+    Main application widget composing the complete UI layout.
+
+    Orchestrates the top, central, and bottom UI components. Handles settings
+    dialog interaction and updates status displays based on system state changes.
+    """
+
     def __init__(self, ctx: AppContext, parent: Optional[QWidget] = None) -> None:
+        """
+        Initialize the main widget.
+
+        Args:
+            ctx: Application context providing access to services and state.
+            parent: Optional parent widget.
+
+        Notes:
+            Creates and arranges the three main UI components (top, center, bottom).
+            Connects the settings button to dialog opening.
+            Calls initialization complete to trigger initial state updates.
+        """
         super().__init__(ctx, parent)
 
         logger.debug("__init__: Initializing main application widget")
@@ -42,7 +61,6 @@ class MainWidget(BaseWidget):
             QSizePolicy.Policy.Expanding,
         )
 
-        # Connect signals
         self._top_widget.settings_clicked.connect(self._on_settings_clicked)
         logger.debug("__init__: Connected settings clicked signal")
 
@@ -53,16 +71,21 @@ class MainWidget(BaseWidget):
         )
 
     def _on_settings_clicked(self) -> None:
-        """Handle settings button click event."""
+        """
+        Handle settings button click by opening the settings dialog.
+
+        Notes:
+            Creates a SettingsDialog, executes it modally, and emits settings
+            updated signal if changes were accepted. Uses context manager pattern
+            for proper cleanup.
+        """
         logger.debug("_on_settings_clicked: Opening settings dialog")
 
-        # Use context manager for proper dialog cleanup
         settings_dialog = None
         try:
             settings_dialog = SettingsDialog(self._ctx)
             result = settings_dialog.exec()
 
-            # If OK was clicked, process the settings
             if result == QDialog.DialogCode.Accepted:
                 logger.debug("_on_settings_clicked: Settings dialog accepted - applying changes")
                 self._ctx.emit_settings_updated()
@@ -75,12 +98,17 @@ class MainWidget(BaseWidget):
                 exc_info=True,
             )
         finally:
-            # Ensure the dialog is properly cleaned up
             if settings_dialog:
                 settings_dialog.deleteLater()
 
     def on_settings_updated(self) -> None:
-        """Handle settings update events."""
+        """
+        Handle settings update events from the application context.
+
+        Notes:
+            Updates the bottom bar with current provider and model information.
+            Called when any setting changes.
+        """
         try:
             settings = self._ctx.settings_service.get_settings_state()
             logger.debug(
@@ -99,7 +127,15 @@ class MainWidget(BaseWidget):
             )
 
     def on_system_ready_changed(self, is_ready: bool) -> None:
-        """Handle system readiness state changes."""
+        """
+        Handle changes in system readiness state.
+
+        Args:
+            is_ready: True if system is ready for processing, False otherwise.
+
+        Notes:
+            Updates the bottom bar initialization status message accordingly.
+        """
         try:
             status = "READY" if is_ready else "NOT READY"
             logger.debug(
@@ -119,7 +155,15 @@ class MainWidget(BaseWidget):
             )
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
-        """Handle widget enabled state changes."""
+        """
+        Handle changes in widget enabled state.
+
+        Args:
+            enabled: True to enable widgets, False to disable.
+
+        Notes:
+            Updates the bottom bar task status message to reflect processing state.
+        """
         try:
             state = "ENABLED" if enabled else "DISABLED"
             logger.debug(

@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSizePolicy, QWidget)
 
 from context import AppContext
@@ -11,9 +11,30 @@ logger = logging.getLogger(__name__)
 
 
 class TopBarWidget(BaseWidget):
+    """
+    Top application bar widget containing the app title and settings button.
+
+    Provides a consistent header with branding and access to application settings.
+    Responds to system state changes by updating button availability.
+    """
+
     settings_clicked = pyqtSignal()
 
     def __init__(self, ctx: AppContext, parent: Optional[QWidget] = None) -> None:
+        """
+        Initialize the top bar widget.
+
+        Args:
+            ctx: Application context for state management.
+            parent: Optional parent widget.
+
+        Raises:
+            Exception: If widget initialization fails due to layout or connection errors.
+
+        Notes:
+            Creates a horizontal layout with app label on the left and settings button on the right.
+            Connects settings button to the settings_clicked signal.
+        """
         super().__init__(ctx, parent)
 
         logger.debug("__init__: Initializing top bar widget")
@@ -38,8 +59,20 @@ class TopBarWidget(BaseWidget):
             )
             raise
 
+        self.setObjectName("app-bar")
+        self._app_label.setObjectName("app-bar-title-link")
+        self._settings_button.setObjectName("app-bar-settings-button")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
     def _configure_layout(self) -> None:
-        """Configure the layout for the top bar."""
+        """
+        Configure the widget's layout and sizing policy.
+
+        Notes:
+            Uses QHBoxLayout with fixed margins and spacing.
+            Adds stretch between label and button to push button to the right.
+            Sets horizontal expansion with fixed height.
+        """
         try:
             logger.debug("_configure_layout: Setting up top bar layout")
 
@@ -48,7 +81,7 @@ class TopBarWidget(BaseWidget):
             layout.setSpacing(16)
 
             layout.addWidget(self._app_label)
-            layout.addStretch()  # Push settings button to right
+            layout.addStretch()
             layout.addWidget(self._settings_button)
 
             self.setLayout(layout)
@@ -70,7 +103,16 @@ class TopBarWidget(BaseWidget):
             raise
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
-        """Update settings button state based on system readiness."""
+        """
+        Update settings button state based on system readiness and enabled flag.
+
+        Args:
+            enabled: The general widget enabled state from the context.
+
+        Notes:
+            Settings button remains enabled when system is not ready (to allow configuration).
+            Only disabled when system is ready but explicitly told to disable.
+        """
         try:
             system_ready = self._ctx.is_system_ready()
             button_state = "ENABLED" if (system_ready and enabled) else "DISABLED"

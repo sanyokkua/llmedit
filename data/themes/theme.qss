@@ -1,0 +1,552 @@
+/* === Global === */
+QWidget {
+    background-color: {{color-surface}};
+    color: {{color-on-surface}};
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+QTextEdit, QPlainTextEdit {
+    background-color: {{color-secondary-container}};
+    color: {{color-on-secondary-container}};
+    border: 1px solid {{color-primary}};
+    padding: 6px;
+    border-radius: 4px;
+}
+QTextEdit:focus, QPlainTextEdit:focus {
+    border: 2px solid {{color-primary}};
+}
+
+QPushButton {
+    background-color: {{color-primary}};
+    color: {{color-on-primary}};
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+}
+QPushButton:hover {
+    background-color: #005048;
+}
+QPushButton:pressed {
+    background-color: #004038;
+}
+
+/* === App Bar - Primary Color Header === */
+#app-bar {
+    background-color: {{color-primary}};
+    min-height: 48px; /* Standard app bar height */
+    padding: 0 12px; /* Matches your layout margins */
+}
+
+/* Title label - transparent with white text */
+#app-bar-title-link {
+    background-color: transparent;
+    color: {{color-on-primary}};
+    font-size: 15px;
+    letter-spacing: 0.5px;
+}
+
+/* Outlined settings button - Material Design spec compliant */
+#app-bar-settings-button {
+    background-color: transparent;
+    color: {{color-on-primary}};
+    border: 1px solid {{color-on-primary}}; /* Standard outlined button border */
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-width: 80px;
+    font-weight: 500;
+}
+
+/* Interaction states */
+#app-bar-settings-button:hover {
+    background-color: rgba(255, 255, 255, 0.12); /* MD hover overlay */
+    border-color: {{color-on-primary}};
+}
+
+#app-bar-settings-button:pressed {
+    background-color: rgba(255, 255, 255, 0.24); /* MD pressed state */
+    border-color: {{color-on-primary}};
+}
+
+#app-bar-settings-button:disabled {
+    border-color: rgba(255, 255, 255, 0.3); /* MD disabled opacity */
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* === Status Bar - Primary Color Footer === */
+#bottom-bar {
+    background-color: {{color-primary}};
+    min-height: 16px; /* Standard status bar height */
+    padding: 0 8px; /* Matches your layout margins */
+    font-size: 5px; /* Smaller than top bar as requested */
+}
+
+/* Status labels - transparent with white text */
+#bottom-bar QLabel {
+    background-color: transparent;
+    color: {{color-on-primary}};
+    padding: 4px 0; /* Vertical padding for readability */
+}
+
+/* Special styling for initialization status (right-aligned) */
+#bottom-bar-initialization-status {
+    font-weight: 300; /* Slightly bolder for important status */
+    letter-spacing: 0.25px;
+}
+
+/* === Text Interaction Widget Buttons === */
+/* Targets ONLY the paste/copy buttons in this specific widget */
+TextInteractionAreasWidget QToolButton {
+    background-color: {{color-primary}};
+    color: {{color-on-primary}};
+    border: none;
+    border-radius: 4px;
+    padding: 4px 12px;
+    min-width: 72px;
+    font-weight: 500;
+    font-size: 13px;
+}
+
+/* Hover state (12% darker - Material Design spec) */
+TextInteractionAreasWidget QToolButton:hover {
+    background-color: #005048; /* Calculated from {{color-primary}} */
+}
+
+/* Pressed state (24% darker - Material Design spec) */
+TextInteractionAreasWidget QToolButton:pressed {
+    background-color: #004038; /* Calculated from {{color-primary}} */
+}
+
+/* Disabled state (matches your on_widgets_enabled_changed logic) */
+TextInteractionAreasWidget QToolButton:disabled {
+    background-color: rgba(0, 107, 95, 0.6);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* === Action Controls Widget - Complete Fix === */
+#action-controls-widget {
+    background-color: {{color-secondary-container}};
+    border-radius: 1px;
+    padding: 4px;
+}
+
+/* Fix for the container inside scroll area (previously had default background) */
+#action-controls-widget QScrollArea > QWidget > QWidget {
+    background-color: {{color-secondary-container}};
+}
+
+/* Outlined action buttons - transparent with secondary container text */
+#action-controls-widget QPushButton {
+    background-color: transparent;
+    color: {{color-on-secondary-container}};
+    border: 1px solid {{color-on-secondary-container}};
+    border-radius: 4px;
+    padding: 6px 12px;
+    min-height: 24px;
+    text-align: center;
+}
+
+/* Button interaction states */
+#action-controls-widget QPushButton:hover {
+    background-color: rgba(51, 75, 71, 0.08); /* 8% overlay */
+    border-color: {{color-on-secondary-container}};
+}
+
+#action-controls-widget QPushButton:pressed {
+    background-color: rgba(51, 75, 71, 0.16); /* 16% overlay */
+    border-color: {{color-on-secondary-container}};
+}
+
+#action-controls-widget QPushButton:disabled {
+    border-color: rgba(51, 75, 71, 0.4);
+    color: rgba(51, 75, 71, 0.6);
+}
+
+/* Modernized dropdown styling - smaller and cleaner */
+#action-controls-widget QComboBox {
+    background-color: transparent;
+    color: {{color-on-secondary-container}};
+    border: 1px solid {{color-on-secondary-container}};
+    border-radius: 4px;
+    padding: 2px 8px; /* Reduced vertical padding */
+    min-height: 14px; /* Smaller height */
+    font-size: 13px;
+    selection-background-color: rgba(0, 107, 95, 0.12);
+    selection-color: {{color-on-secondary-container}};
+}
+/* Modern dropdown dropdown arrow - smaller and centered */
+#action-controls-widget QComboBox::drop-down {
+    width: 14px;
+    height: 14px;
+    border: none;
+}
+
+/* Remove focus rectangle that can look dated */
+#action-controls-widget QComboBox:focus {
+    border-color: {{color-primary}};
+    outline: none;
+}
+
+/* Modern dropdown hover state */
+#action-controls-widget QComboBox:hover {
+    background-color: rgba(51, 75, 71, 0.08);
+    border-color: {{color-on-secondary-container}};
+}
+
+/* Compact dropdown pressed state */
+#action-controls-widget QComboBox:pressed {
+    background-color: rgba(51, 75, 71, 0.16);
+}
+
+
+#action-controls-widget QComboBox::down-arrow {
+    image: url(:/icons/arrow-down.svg);
+    width: 10px; /* Smaller arrow */
+    height: 10px;
+    subcontrol-position: center right;
+    margin-right: 4px;
+}
+
+/* Modern dropdown popup menu */
+#action-controls-widget QComboBox QAbstractItemView {
+    background-color: {{color-surface}};
+    color: {{color-on-surface}};
+    border: 1px solid {{color-outline}};
+    border-radius: 4px;
+    outline: none;
+    padding: 2px;
+    min-width: 100px;
+    font-size: 13px;
+}
+
+#action-controls-widget QComboBox QAbstractItemView::item {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+#action-controls-widget QComboBox QAbstractItemView::item:selected {
+    background-color: rgba(0, 107, 95, 0.12);
+    color: {{color-on-secondary-container}};
+}
+
+#action-controls-widget QComboBox::down-arrow {
+    image: none;
+    border: none;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid {{color-on-secondary-container}};
+    margin-right: 6px;
+}
+
+/* === Modern Tab Widget Styling === */
+#action-tabs-widget {
+    background-color: {{color-surface}};
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+/* Tab bar container - clean modern look */
+#action-tabs-widget QTabBar {
+    background-color: transparent;
+    border: none;
+    min-height: 40px;
+}
+
+/* Individual tab styling - modern flat design */
+#action-tabs-widget QTabBar::tab {
+    background-color: transparent;
+    color: {{color-on-surface}};
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    margin-right: 4px;
+    min-width: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+/* Hover state - subtle background */
+#action-tabs-widget QTabBar::tab:hover {
+    background-color: rgba(63, 73, 70, 0.08);
+    color: {{color-on-surface}};
+}
+
+/* Selected tab - primary color indicator */
+#action-tabs-widget QTabBar::tab:selected {
+    color: {{color-primary}};
+    font-weight: 600;
+    background-color: rgba(0, 107, 95, 0.08);
+    border-bottom: 3px solid {{color-primary}};
+}
+
+/* Disabled state - matches your on_widgets_enabled_changed logic */
+#action-tabs-widget:disabled {
+    opacity: 0.6;
+}
+
+/* Remove the default base line under tabs */
+#action-tabs-widget QTabBar {
+    qproperty-drawBase: 0;
+}
+
+/* Modern content pane styling */
+#action-tabs-widget QTabWidget::pane {
+    background-color: {{color-surface}};
+    border: 1px solid {{color-outline}};
+    border-radius: 8px;
+    margin-top: -2px; /* Aligns with tab indicators */
+}
+
+
+
+/* === Settings Dialog - Modern Styling === */
+QDialog[windowTitle="Settings"] {
+    background-color: {{color-surface}};
+    color: {{color-on-surface}};
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    min-width: 400px;
+}
+
+/* Form layout styling */
+QDialog[windowTitle="Settings"] QFormLayout {
+    margin: 16px 24px;
+}
+
+QDialog[windowTitle="Settings"] QLabel {
+    color: {{color-on-surface}};
+    padding: 6px 0;
+}
+
+/* Combobox styling - modern outlined style */
+QDialog[windowTitle="Settings"] QComboBox {
+    background-color: transparent;
+    color: {{color-on-surface}};
+    border: 1.5px solid {{color-outline}};
+    border-radius: 4px;
+    padding: 4px 8px;
+    min-height: 32px;
+    selection-background-color: rgba(0, 107, 95, 0.12);
+}
+
+QDialog[windowTitle="Settings"] QComboBox:hover {
+    border-color: {{color-primary}};
+}
+
+QDialog[windowTitle="Settings"] QComboBox:focus {
+    border-color: {{color-primary}};
+    outline: none;
+}
+
+QDialog[windowTitle="Settings"] QComboBox::drop-down {
+    width: 20px;
+    border: none;
+}
+
+QDialog[windowTitle="Settings"] QComboBox::down-arrow {
+    image: url(:/icons/arrow-down.svg);
+    width: 10px;
+    height: 10px;
+    subcontrol-position: center right;
+    margin-right: 4px;
+}
+
+QDialog[windowTitle="Settings"] QComboBox QAbstractItemView {
+    background-color: {{color-surface}};
+    color: {{color-on-surface}};
+    border: 1px solid {{color-outline}};
+    border-radius: 4px;
+    outline: none;
+    padding: 2px;
+    min-width: 100px;
+    font-size: 13px;
+}
+
+QDialog[windowTitle="Settings"] QComboBox QAbstractItemView::item {
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+QDialog[windowTitle="Settings"] QComboBox QAbstractItemView::item:selected {
+    background-color: rgba(0, 107, 95, 0.12);
+}
+
+/* Checkbox styling */
+QDialog[windowTitle="Settings"] QCheckBox {
+    spacing: 10px;
+    padding: 4px 0;
+}
+
+QDialog[windowTitle="Settings"] QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid {{color-outline}};
+    border-radius: 4px;
+    background-color: transparent;
+}
+
+QDialog[windowTitle="Settings"] QCheckBox::indicator:checked {
+    background-color: {{color-primary}};
+    border-color: {{color-primary}};
+}
+
+/* Slider styling */
+QDialog[windowTitle="Settings"] QSlider {
+    height: 32px;
+    margin: 8px 0;
+}
+
+QDialog[windowTitle="Settings"] QSlider::groove:horizontal {
+    height: 4px;
+    background: {{color-outline}};
+    border-radius: 2px;
+    margin: 6px 0;
+}
+
+QDialog[windowTitle="Settings"] QSlider::handle:horizontal {
+    background: {{color-primary}};
+    border: 2px solid {{color-primary}};
+    width: 16px;
+    height: 16px;
+    margin: -6px 0;
+    border-radius: 8px;
+}
+
+QDialog[windowTitle="Settings"] QSlider::handle:horizontal:hover {
+    background: #008a7c;
+    border-color: #008a7c;
+}
+
+/* Button box styling */
+QDialog[windowTitle="Settings"] QDialogButtonBox {
+    margin: 16px 24px;
+    padding-top: 8px;
+    border-top: 1px solid {{color-outline}};
+}
+
+/* Save button - solid primary */
+QDialog[windowTitle="Settings"] QDialogButtonBox QPushButton:accepted {
+    background-color: {{color-primary}};
+    color: {{color-on-primary}};
+    border: none;
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-width: 80px;
+    font-weight: 500;
+}
+
+QDialog[windowTitle="Settings"] QDialogButtonBox QPushButton:accepted:hover {
+    background-color: #005048;
+}
+
+QDialog[windowTitle="Settings"] QDialogButtonBox QPushButton:accepted:pressed {
+    background-color: #004038;
+}
+
+/* Cancel button - outlined secondary */
+QDialog[windowTitle="Settings"] QDialogButtonBox QPushButton:rejected {
+    background-color: transparent;
+    color: {{color-secondary}};
+    border: 1.5px solid {{color-secondary}};
+    border-radius: 4px;
+    padding: 6px 16px;
+    min-width: 80px;
+    font-weight: 500;
+}
+
+QDialog[windowTitle="Settings"] QDialogButtonBox QPushButton:rejected:hover {
+    background-color: rgba(74, 99, 94, 0.08);
+}
+
+QDialog[windowTitle="Settings"] QDialogButtonBox QPushButton:rejected:pressed {
+    background-color: rgba(74, 99, 94, 0.16);
+}
+
+/* Disabled state - consistent with your app */
+QDialog[windowTitle="Settings"] QWidget:disabled {
+    color: rgba(63, 73, 70, 0.6);
+}
+
+QDialog[windowTitle="Settings"] {
+    border-radius: 8px;
+    /* Add this for a subtle shadow effect */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Add this to create a floating label effect for focused inputs */
+QDialog[windowTitle="Settings"] QComboBox:focus + QLabel,
+QDialog[windowTitle="Settings"] QComboBox:has(editable true):focus + QLabel {
+    color: {{color-primary}};
+    font-size: 12px;
+    transform: translateY(-18px);
+    transition: all 0.2s ease;
+}
+/* Make form background match secondary container */
+QDialog[windowTitle="Settings"] {
+    background-color: {{color-secondary-container}};
+    color: {{color-on-secondary-container}};
+}
+
+/* === Improved Slider Styling - Clear Enabled/Disabled States === */
+QDialog[windowTitle="Settings"] QSlider {
+    height: 32px;
+    margin: 8px 0;
+}
+
+/* Slider track - clear visual distinction between states */
+QDialog[windowTitle="Settings"] QSlider::groove:horizontal {
+    height: 4px;
+    background: {{color-outline}};
+    border-radius: 2px;
+    margin: 6px 0;
+}
+
+/* Disabled track - lighter and more subtle */
+QDialog[windowTitle="Settings"] QSlider:disabled::groove:horizontal {
+    background: rgba(111, 121, 118, 0.3); /* Much lighter than enabled */
+    height: 3px; /* Slightly thinner when disabled */
+}
+
+/* Slider handle - most important visual indicator */
+QDialog[windowTitle="Settings"] QSlider::handle:horizontal {
+    background: {{color-primary}};
+    border: 2px solid {{color-primary}};
+    width: 16px;
+    height: 16px;
+    margin: -6px 0;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+/* Disabled handle - completely different appearance */
+QDialog[windowTitle="Settings"] QSlider:disabled::handle:horizontal {
+    background: {{color-outline}}; /* Matches track when disabled */
+    border: 2px solid {{color-outline}};
+    width: 14px; /* Slightly smaller when disabled */
+    height: 14px;
+    margin: -5px 0;
+}
+
+/* Hover state only applies when enabled */
+QDialog[windowTitle="Settings"] QSlider::handle:horizontal:hover:not(:disabled) {
+    background: #008a7c;
+    border-color: #008a7c;
+    transform: scale(1.1); /* Subtle size increase on hover */
+}
+
+/* Active state only applies when enabled */
+QDialog[windowTitle="Settings"] QSlider::handle:horizontal:pressed:not(:disabled) {
+    background: #004038;
+    border-color: #004038;
+    transform: scale(0.95);
+}
+
+/* Add subtle label to indicate disabled state */
+QDialog[windowTitle="Settings"] QLabel[tempSlider="true"]:disabled {
+    color: rgba(63, 73, 70, 0.6);
+    font-style: italic;
+}

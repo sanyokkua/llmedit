@@ -10,7 +10,23 @@ logger = logging.getLogger(__name__)
 
 
 class SettingsLlamaCppProvider(SettingsLLMProvider):
+    """
+    Implementation of SettingsLLMProvider for llama.cpp backend.
+
+    Discovers and manages GGUF-format models stored in a local directory.
+    Uses predefined model configurations to identify available models.
+    """
+
     def __init__(self, model_folder_path: Path) -> None:
+        """
+        Initialize provider with path to model storage directory.
+
+        Args:
+            model_folder_path: Directory where GGUF model files are stored.
+
+        Notes:
+            The path is used to check file existence when determining model availability.
+        """
         self._model_folder_path = model_folder_path
         logger.debug(
             "__init__: Model folder path set to '%s'",
@@ -23,7 +39,11 @@ class SettingsLlamaCppProvider(SettingsLLMProvider):
         Retrieve available GGUF models from configured folder.
 
         Returns:
-            List of available LLM models sorted by name
+            List of LlmModel instances for available models, sorted alphabetically by name.
+
+        Notes:
+            Only returns models whose files exist in the configured folder.
+            Logs errors but returns empty list on failure.
         """
         logger.debug(
             "get_model_list: Scanning '%s' for %d predefined models",
@@ -32,7 +52,6 @@ class SettingsLlamaCppProvider(SettingsLLMProvider):
         )
 
         try:
-            # Filter available models using list comprehension
             available_models = [
                 LlmModel(
                     id=model.fileName,
@@ -53,18 +72,21 @@ class SettingsLlamaCppProvider(SettingsLLMProvider):
             len(PREDEFINED_GGUF_MODELS),
         )
 
-        # Sort models by name (more readable than lambda)
         return sorted(available_models, key=lambda model: model.name)
 
     def _is_model_available(self, file_name: str) -> bool:
         """
-        Check if a model file exists and is available.
+        Check if a model file exists and is accessible.
 
         Args:
-            file_name: Name of the model file to check
+            file_name: Name of the model file to check.
 
         Returns:
-            True if model file exists and is a regular file, False otherwise
+            True if the file exists and is a regular file, False otherwise.
+
+        Notes:
+            Performs filesystem check using pathlib. Logs detailed information about
+            file existence and type.
         """
         try:
             model_path = self._model_folder_path / file_name

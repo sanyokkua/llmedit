@@ -23,6 +23,12 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True)
 class ActionEvent:
+    """
+    Immutable data class representing a button click event in the action controls.
+
+    Carries the action ID, associated prompt, and optional callbacks for retrieving
+    dropdown values at event time.
+    """
     action_id: str
     prompt: Prompt
     input_dropdown_item: Optional[CallableType[[], str]] = None
@@ -30,18 +36,39 @@ class ActionEvent:
 
 
 class ActionControlsWidget(BaseWidget):
+    """
+    Widget displaying a grid of action buttons with optional input/output dropdowns.
+
+    Dynamically arranges prompt-based action buttons in a responsive grid layout.
+    Emits signals when buttons are clicked, including dropdown values if present.
+    """
+
     button_clicked = pyqtSignal(ActionEvent)
 
-    def __init__(self,
-                 ctx: AppContext,
-                 prompts: List[Prompt],
-                 input_dropdown_items: Optional[List[str]] = None,
-                 output_dropdown_items: Optional[List[str]] = None,
-                 parent=None,
-                 ):
+    def __init__(
+        self,
+        ctx: AppContext,
+        prompts: List[Prompt],
+        input_dropdown_items: Optional[List[str]] = None,
+        output_dropdown_items: Optional[List[str]] = None,
+        parent=None,
+    ):
+        """
+        Initialize the action controls widget.
+
+        Args:
+            ctx: Application context for shared services and state.
+            prompts: List of prompts to create action buttons for.
+            input_dropdown_items: Optional list of items for input dropdown.
+            output_dropdown_items: Optional list of items for output dropdown.
+            parent: Optional parent widget.
+
+        Notes:
+            Dropdowns are only shown if both input and output items are provided.
+            Buttons are arranged in a 4-column grid that relayouts on resize.
+        """
         super().__init__(ctx, parent)
 
-        # Log initialization with key metrics
         logger.debug(
             "__init__: Initializing with %d prompts, dropdowns=%s",
             len(prompts),
@@ -51,12 +78,10 @@ class ActionControlsWidget(BaseWidget):
         self._prompts = prompts
         self._buttons: Dict[str, QPushButton] = { }
 
-        # Top-level layout
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(4, 4, 4, 4)
         main_layout.setSpacing(6)
 
-        # ─── DROPDOWNS (conditionally shown) ─────────────────────────
         show_dropdowns = bool(input_dropdown_items) and bool(output_dropdown_items)
         if show_dropdowns:
             logger.debug(
@@ -96,7 +121,6 @@ class ActionControlsWidget(BaseWidget):
             self._input_dropdown = None  # type: ignore
             self._output_dropdown = None  # type: ignore
 
-        # ─── SCROLL AREA CONTAINER ───────────────────────────────────
         self._scroll_area = QScrollArea()
         self._scroll_area.setWidgetResizable(True)
         self._scroll_area.setVerticalScrollBarPolicy(
@@ -107,14 +131,12 @@ class ActionControlsWidget(BaseWidget):
         )
         main_layout.addWidget(self._scroll_area, stretch=1)
 
-        # Container inside a scroll area, with a grid layout
         self._container = QWidget()
         self._grid = QGridLayout(self._container)
         self._grid.setContentsMargins(0, 0, 0, 0)
         self._grid.setSpacing(1)
         self._scroll_area.setWidget(self._container)
 
-        # Create and register all buttons
         logger.debug("__init__: Creating %d action buttons", len(prompts))
         for prompt in self._prompts:
             btn = QPushButton(prompt.name)
@@ -132,11 +154,21 @@ class ActionControlsWidget(BaseWidget):
             )
             btn.clicked.connect(lambda checked, e=event: self.button_clicked.emit(e))
             self._buttons[prompt.id] = btn
-
-        # Initial layout
+        self.setObjectName("action-controls-widget")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self._relayout_buttons()
 
+
     def input_dropdown_value(self) -> str:
+        """
+        Get the current text from the input dropdown.
+
+        Returns:
+            Current text of input dropdown, or empty string if not available.
+
+        Notes:
+            Used by ActionEvent to capture dropdown state at button click time.
+        """
         try:
             value = self._input_dropdown.currentText() if self._input_dropdown else ""
             logger.debug("input_dropdown_value: Returning '%s'", value)
@@ -150,6 +182,15 @@ class ActionControlsWidget(BaseWidget):
             return ""
 
     def output_dropdown_value(self) -> str:
+        """
+        Get the current text from the output dropdown.
+
+        Returns:
+            Current text of output dropdown, or empty string if not available.
+
+        Notes:
+            Used by ActionEvent to capture dropdown state at button click time.
+        """
         try:
             value = self._output_dropdown.currentText() if self._output_dropdown else ""
             logger.debug("output_dropdown_value: Returning '%s'", value)
@@ -163,6 +204,15 @@ class ActionControlsWidget(BaseWidget):
             return ""
 
     def resizeEvent(self, event):
+        """
+        Handle widget resize events by relayouting buttons.
+
+        Args:
+            event: The resize event.
+
+        Notes:
+            Calls parent implementation and triggers grid rearrangement.
+        """
         try:
             super().resizeEvent(event)
             logger.debug("resizeEvent: Widget resized to %dx%d", self.width(), self.height())
@@ -175,24 +225,27 @@ class ActionControlsWidget(BaseWidget):
             )
 
     def _relayout_buttons(self):
+        """
+        Rearrange buttons in the grid layout.
+
+        Notes:
+            Clears existing layout and arranges buttons in a 4-column grid.
+            Each column is stretched equally. Logs the final grid dimensions.
+        """
         try:
             logger.debug("_relayout_buttons: Rearranging %d buttons", len(self._buttons))
 
-            # Clear existing widgets
             while self._grid.count() > 0:
                 item = self._grid.takeAt(0)
                 if item and item.widget():
                     self._grid.removeWidget(item.widget())
 
-            # Fixed the number of columns
             cols = 4
 
-            # Place buttons in a grid, stretched to column width
             for idx, btn in enumerate(self._buttons.values()):
                 row = idx // cols
                 col = idx % cols
                 self._grid.addWidget(btn, row, col)
-                # Make sure each button expands to fill its column
                 self._grid.setColumnStretch(col, 1)
 
             logger.debug(
@@ -208,6 +261,16 @@ class ActionControlsWidget(BaseWidget):
             )
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
+        """
+        Update the enabled state of all contained widgets.
+
+        Args:
+            enabled: True to enable all widgets, False to disable.
+
+        Notes:
+            Affects buttons and dropdowns (if present). Used to prevent interaction
+            during processing or when context is not ready.
+        """
         try:
             state = "ENABLED" if enabled else "DISABLED"
             logger.debug("on_widgets_enabled_changed: Setting widget state to %s", state)

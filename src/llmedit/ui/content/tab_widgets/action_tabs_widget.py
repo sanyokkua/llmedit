@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (QSizePolicy, QTabWidget, QWidget)
 
 from context import AppContext
@@ -12,13 +12,34 @@ logger = logging.getLogger(__name__)
 
 
 class ActionTabsWidget(QTabWidget):
+    """
+    Tabbed widget organizing action buttons by category (Proofreading, Formatting, Translating).
+
+    Each tab contains an ActionControlsWidget with prompts from a specific category.
+    Emits signals when action buttons are clicked and disables itself during active tasks.
+    """
+
     action_button_clicked = pyqtSignal(ActionEvent)
 
     def __init__(self, ctx: AppContext, parent: Optional[QWidget] = None) -> None:
+        """
+        Initialize the tab widget with categorized action controls.
+
+        Args:
+            ctx: Application context providing access to services and state.
+            parent: Optional parent widget.
+
+        Raises:
+            Exception: If initialization fails due to service errors or invalid data.
+
+        Notes:
+            Creates three tabs: Proofreading, Formatting, and Translating.
+            Translation tab includes input/output language dropdowns.
+            Automatically subscribes to task service busy state to disable during processing.
+        """
         super().__init__(parent)
 
         try:
-            # Log initialization with key metrics
             proofreading_prompts = ctx.prompt_service.get_prompts_by_category(PromptCategory.PROOFREAD)
             formatting_prompts = ctx.prompt_service.get_prompts_by_category(PromptCategory.FORMAT)
             translation_prompts = ctx.prompt_service.get_prompts_by_category(PromptCategory.TRANSLATE)
@@ -70,9 +91,20 @@ class ActionTabsWidget(QTabWidget):
                 exc_info=True,
             )
             raise
+        self.setObjectName("action-tabs-widget")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
     def _set_widget_enabled(self, running: bool) -> None:
-        """Update widget state based on task service busy status."""
+        """
+        Update widget enabled state based on task execution status.
+
+        Args:
+            running: True if any task is currently running, False otherwise.
+
+        Notes:
+            Disables the entire widget when tasks are running to prevent concurrent actions.
+            Called automatically via subscription to task service busy state changes.
+        """
         try:
             enabled = not running
             self.setEnabled(enabled)
@@ -89,7 +121,16 @@ class ActionTabsWidget(QTabWidget):
             )
 
     def _on_action_btn_clicked(self, action: ActionEvent) -> None:
-        """Handle action button click events."""
+        """
+        Handle action button click events from any tab.
+
+        Args:
+            action: The action event containing prompt and dropdown information.
+
+        Notes:
+            Forwards the event to the action_button_clicked signal.
+            Logs the action ID and prompt name for debugging.
+        """
         try:
             logger.debug(
                 "_on_action_btn_clicked: Button '%s' clicked (prompt: '%s')",

@@ -22,14 +22,28 @@ class PromptValidationError(ValueError):
 class AppPromptService(PromptService):
     """
     Concrete PromptService using a fixed, in-memory list of application prompts.
+
     Public methods override PromptService to provide app-specific behavior.
+    This implementation retrieves prompts from a static collection and supports parameterized template rendering.
     """
 
     @override
     def get_prompt(self, prompt_id: str) -> Prompt:
         """
-        Override: Return the Prompt whose `id` matches `prompt_id`.
-        Raises PromptNotFoundError if no match.
+        Return the Prompt whose `id` matches the given prompt_id.
+
+        Args:
+            prompt_id: The unique identifier of the prompt to retrieve.
+
+        Returns:
+            Prompt: The prompt object with the matching ID.
+
+        Raises:
+            PromptNotFoundError: If no prompt with the given ID exists.
+
+        Notes:
+            Performs a linear search through the APPLICATION_PROMPTS collection.
+            Logs debug and warning messages for lookup results.
         """
         logger.debug("get_prompt: looking up id=%r", prompt_id)
 
@@ -48,7 +62,17 @@ class AppPromptService(PromptService):
     @override
     def get_prompts_by_category(self, category: PromptCategory) -> Sequence[Prompt]:
         """
-        Override: Return all prompts whose `.category` equals the given category.
+        Return all prompts whose category matches the given PromptCategory.
+
+        Args:
+            category: The category to filter prompts by.
+
+        Returns:
+            Sequence[Prompt]: A list of prompts belonging to the specified category.
+
+        Notes:
+            Returns an empty sequence if no prompts match.
+            Logs the number of results at info level.
         """
         logger.debug(
             "get_prompts_by_category: filtering category=%s", category.value,
@@ -70,8 +94,21 @@ class AppPromptService(PromptService):
         parameters: Dict[str, str],
     ) -> str:
         """
-        Override: Substitute placeholders in `prompt.template` with values from `parameters`.
-        Raises PromptValidationError if validation fails.
+        Substitute placeholders in the prompt's template with corresponding parameter values.
+
+        Args:
+            prompt: The prompt object containing the template to fill.
+            parameters: A dictionary mapping parameter names to their values.
+
+        Returns:
+            str: The fully rendered prompt string with all placeholders replaced.
+
+        Raises:
+            PromptValidationError: If required parameters are missing or validation fails.
+
+        Notes:
+            Uses validate_prompt_parameters to check input validity before substitution.
+            Logs the result snippet (truncated if longer than 100 characters).
         """
         logger.debug(
             "apply_prompt_parameters: id=%r, params=%s",
@@ -79,7 +116,6 @@ class AppPromptService(PromptService):
             list(parameters.keys()),
         )
 
-        # Validate; uses public validate_prompt_parameters
         is_valid, error = self.validate_prompt_parameters(prompt, parameters)
         if not is_valid:
             logger.error(
@@ -89,7 +125,6 @@ class AppPromptService(PromptService):
             )
             raise PromptValidationError(error)
 
-        # Perform all replacements
         filled = self._substitute_placeholders(prompt.template, parameters)
 
         snippet = filled if len(filled) <= 100 else filled[:100] + "…"
@@ -103,8 +138,20 @@ class AppPromptService(PromptService):
         parameters: Dict[str, str],
     ) -> Tuple[bool, str]:
         """
-        Override: Validate required parameters are present.
-        Returns (True, "") if valid, otherwise (False, error_message).
+        Validate that all required parameters for the prompt are present in the input.
+
+        Args:
+            prompt: The prompt whose required parameters are checked.
+            parameters: The provided parameters to validate.
+
+        Returns:
+            Tuple[bool, str]: A tuple where the first element is True if validation
+                passes, otherwise False. The second element is an empty string on
+                success or an error message on failure.
+
+        Notes:
+            Only checks presence of required keys; does not validate their values.
+            Logs missing parameters as warnings.
         """
         missing = [p for p in prompt.parameters if p not in parameters]
         if missing:
@@ -127,8 +174,18 @@ class AppPromptService(PromptService):
         parameters: Mapping[str, str],
     ) -> str:
         """
-        Internal: Replace all occurrences of `{{key}}` in `template` with
-        `parameters[key]`.
+        Replace all occurrences of `{{key}}` in the template with corresponding values from parameters.
+
+        Args:
+            template: The string containing placeholders to replace.
+            parameters: A mapping of placeholder names to their replacement values.
+
+        Returns:
+            str: The template string with all placeholders substituted.
+
+        Notes:
+            Placeholder format is double-braced: `{{key}}`.
+            No escaping or nested substitution is performed.
         """
         result = template
         for key, val in parameters.items():

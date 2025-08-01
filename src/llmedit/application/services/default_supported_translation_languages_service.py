@@ -18,25 +18,26 @@ SUPPORTED_LANGUAGES: tuple[str, ...] = (
 )
 
 
-class DefaultSupportedTranslationLanguagesService(
-    SupportedTranslationLanguagesService,
-):
+class DefaultSupportedTranslationLanguagesService(SupportedTranslationLanguagesService):
     """
-    Default implementation of SupportedTranslationLanguagesService
-    that returns a fixed set of languages.
+    Default implementation of SupportedTranslationLanguagesService that returns a fixed set of supported languages.
+
+    This service provides a static list of translation languages. A new list instance is returned on each call
+    to prevent external modification of the internal immutable tuple.
     """
 
     def get_supported_translation_languages(self) -> Sequence[str]:
         """
         Return a fresh list of all supported translation languages.
 
-        By returning a new list each time, we prevent external
-        callers from mutating the module‐level tuple.
+        Returns:
+            Sequence[str]: A new list containing the names of all supported translation languages.
+                The list is built from a module-level immutable tuple to ensure consistency and thread safety.
+
+        Notes:
+            The returned list is a copy to prevent external callers from mutating the internal state.
+            Debug-level logging is performed with the list contents.
         """
-        # Build a new list from the immutable tuple
         langs = list(SUPPORTED_LANGUAGES)
-
-        # Single debug log with lazy formatting
         logger.debug("Supported translation languages → %s", langs)
-
         return langs

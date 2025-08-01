@@ -12,7 +12,24 @@ logger = logging.getLogger(__name__)
 
 
 class MainWindow(QMainWindow):
+    """
+    Main application window managing the top-level UI and window lifecycle.
+
+    Handles window initialization, centering on screen, and first-time setup.
+    Contains the main widget as its central widget.
+    """
+
     def __init__(self, ctx: AppContext):
+        """
+        Initialize the main window.
+
+        Args:
+            ctx: Application context for shared services and state.
+
+        Notes:
+            Sets up the main widget as central content and configures default window size.
+            Initialization is deferred until showEvent to ensure proper display setup.
+        """
         super().__init__()
 
         logger.debug("__init__: Initializing main application window")
@@ -32,7 +49,14 @@ class MainWindow(QMainWindow):
         self.default_height = 600
 
     def center_on_screen(self) -> None:
-        """Center the window on the appropriate screen."""
+        """
+        Center the window on the appropriate screen.
+
+        Notes:
+            Uses the screen at the current window position, falling back to primary screen.
+            Calculates center position based on available screen geometry.
+            Logs positioning calculations and handles errors gracefully.
+        """
         logger.debug("center_on_screen: Attempting to center window on screen")
 
         try:
@@ -76,7 +100,16 @@ class MainWindow(QMainWindow):
             )
 
     def showEvent(self, event) -> None:
-        """Handle window show event."""
+        """
+        Handle window show event for initialization.
+
+        Args:
+            event: The show event.
+
+        Notes:
+            On first show, resizes window to default dimensions and centers it.
+            Sets initialization flag to prevent reinitialization on subsequent shows.
+        """
         logger.debug("showEvent: Window show event triggered")
 
         try:
