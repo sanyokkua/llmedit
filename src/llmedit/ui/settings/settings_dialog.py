@@ -1,13 +1,13 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
-    QDialog, QVBoxLayout, QFormLayout, QHBoxLayout,
-    QLabel, QComboBox, QSlider, QCheckBox, QPushButton, QDialogButtonBox
+    QDialog, QVBoxLayout, QFormLayout, QLabel, QComboBox, QSlider, QCheckBox, QDialogButtonBox
 )
 
 from context import AppContext
-from core.models.enums.settings import LlmProviderType
-from core.models.settings import LlmModel, SettingsState
 from core.interfaces.settings.settings_service import SettingsService
+from core.models.enums.settings import LlmProviderType
+from core.models.settings import SettingsState
+
 
 class SettingsDialog(QDialog):
     def __init__(self, app_context: AppContext, parent=None):

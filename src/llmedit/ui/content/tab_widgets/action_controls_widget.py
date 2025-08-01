@@ -1,33 +1,45 @@
+import logging
 from dataclasses import dataclass
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Callable as CallableType
 
-from PyQt6.QtCore import pyqtSignal, Qt, QSize
+from PyQt6.QtCore import pyqtSignal, Qt
 from PyQt6.QtWidgets import (
     QWidget, QScrollArea, QVBoxLayout, QHBoxLayout, QGridLayout,
     QPushButton, QSizePolicy, QComboBox
 )
-from black.lines import Callable  # (you may need to replace this import)
 
+from context import AppContext
 from core.models.data_types import Prompt
+from ui.base_widget import BaseWidget
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
 class ActionEvent:
     action_id: str
     prompt: Prompt
-    input_dropdown_item: Optional[Callable[[], str]] = None
-    output_dropdown_item: Optional[Callable[[], str]] = None
+    input_dropdown_item: Optional[CallableType[[], str]] = None
+    output_dropdown_item: Optional[CallableType[[], str]] = None
 
 
-class ActionControlsWidget(QWidget):
+class ActionControlsWidget(BaseWidget):
     button_clicked = pyqtSignal(ActionEvent)
 
     def __init__(self,
+                 ctx: AppContext,
                  prompts: List[Prompt],
                  input_dropdown_items: Optional[List[str]] = None,
                  output_dropdown_items: Optional[List[str]] = None,
                  parent=None):
-        super().__init__(parent)
+        super().__init__(ctx, parent)
+
+        # Log initialization with key metrics
+        logger.debug(
+            "__init__: Initializing with %d prompts, dropdowns=%s",
+            len(prompts),
+            "enabled" if (input_dropdown_items and output_dropdown_items) else "disabled"
+        )
 
         self._prompts = prompts
         self._buttons: Dict[str, QPushButton] = {}
@@ -40,6 +52,12 @@ class ActionControlsWidget(QWidget):
         # ─── DROPDOWNS (conditionally shown) ─────────────────────────
         show_dropdowns = bool(input_dropdown_items) and bool(output_dropdown_items)
         if show_dropdowns:
+            logger.debug(
+                "__init__: Adding dropdowns with %d input and %d output items",
+                len(input_dropdown_items or []),
+                len(output_dropdown_items or [])
+            )
+
             dropdown_layout = QHBoxLayout()
             dropdown_layout.setSpacing(8)
 
@@ -50,7 +68,7 @@ class ActionControlsWidget(QWidget):
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Fixed
             )
-            for item in input_dropdown_items:
+            for item in input_dropdown_items or []:
                 self._input_dropdown.addItem(item)
             dropdown_layout.addWidget(self._input_dropdown)
 
@@ -61,12 +79,13 @@ class ActionControlsWidget(QWidget):
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Fixed
             )
-            for item in output_dropdown_items:
+            for item in output_dropdown_items or []:
                 self._output_dropdown.addItem(item)
             dropdown_layout.addWidget(self._output_dropdown)
 
             main_layout.addLayout(dropdown_layout)
         else:
+            logger.debug("__init__: Dropdowns not needed (missing items)")
             self._input_dropdown = None  # type: ignore
             self._output_dropdown = None  # type: ignore
 
@@ -89,6 +108,7 @@ class ActionControlsWidget(QWidget):
         self._scroll_area.setWidget(self._container)
 
         # Create and register all buttons
+        logger.debug("__init__: Creating %d action buttons", len(prompts))
         for prompt in self._prompts:
             btn = QPushButton(prompt.name)
             btn.setToolTip(prompt.description)
@@ -110,16 +130,23 @@ class ActionControlsWidget(QWidget):
         self._relayout_buttons()
 
     def input_dropdown_value(self) -> str:
-        return self._input_dropdown.currentText() if self._input_dropdown else ""
+        value = self._input_dropdown.currentText() if self._input_dropdown else ""
+        logger.debug("input_dropdown_value: Returning '%s'", value)
+        return value
 
     def output_dropdown_value(self) -> str:
-        return self._output_dropdown.currentText() if self._output_dropdown else ""
+        value = self._output_dropdown.currentText() if self._output_dropdown else ""
+        logger.debug("output_dropdown_value: Returning '%s'", value)
+        return value
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        logger.debug("resizeEvent: Widget resized to %dx%d", self.width(), self.height())
         self._relayout_buttons()
 
     def _relayout_buttons(self):
+        logger.debug("_relayout_buttons: Rearranging %d buttons", len(self._buttons))
+
         # Clear existing widgets
         while self._grid.count() > 0:
             item = self._grid.takeAt(0)
@@ -136,3 +163,21 @@ class ActionControlsWidget(QWidget):
             self._grid.addWidget(btn, row, col)
             # Make sure each button expands to fill its column
             self._grid.setColumnStretch(col, 1)
+
+        logger.debug(
+            "_relayout_buttons: Arranged into %d rows (%d columns)",
+            (len(self._buttons) + cols - 1) // cols,
+            cols
+        )
+
+    def on_widgets_enabled_changed(self, enabled: bool) -> None:
+        state = "ENABLED" if enabled else "DISABLED"
+        logger.debug("on_widgets_enabled_changed: Setting widget state to %s", state)
+
+        buttons = self._buttons.values()
+        for btn in buttons:
+            btn.setEnabled(enabled)
+        if self._input_dropdown:
+            self._input_dropdown.setEnabled(enabled)
+        if self._output_dropdown:
+            self._output_dropdown.setEnabled(enabled)

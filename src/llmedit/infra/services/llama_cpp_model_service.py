@@ -17,58 +17,108 @@ class LlamaCppModelService(ModelService):
         self._model_folder_path = model_folder_path
         self._model_information = model_information
         self._model: Optional[Llama] = None
-        logger.debug(f"Model folder path: {self._model_folder_path}")
-        logger.debug(f"Model information: {self._model_information}")
+
+        logger.debug(
+            "__init__: Initialized for model '%s' (file: '%s')",
+            self._model_information.name,
+            self._model_information.fileName
+        )
 
     def get_model_information(self) -> ModelInformation:
+        """Retrieve model configuration details."""
+        logger.debug(
+            "get_model_information: Returning model '%s' (provider: %s)",
+            self._model_information.name,
+            self._model_information.provider.value
+        )
         return self._model_information
 
     def is_model_loaded(self) -> bool:
-        logger.debug(f"Model loaded: {self._model is not None}")
-        return self._model is not None
+        """Check if model is currently loaded in memory."""
+        loaded = self._model is not None
+        logger.debug("is_model_loaded: Model status: %s", "LOADED" if loaded else "UNLOADED")
+        return loaded
 
     def load_model(self) -> None:
+        """Load model into memory if not already loaded."""
         if self.is_model_loaded():
-            logger.debug("Model already loaded")
+            logger.debug("load_model: Model already loaded - skipping reload")
             return
+
+        model_path = self._model_folder_path / self._model_information.fileName
+        logger.debug(
+            "load_model: Loading model '%s' from '%s'",
+            self._model_information.name,
+            model_path
+        )
+
         try:
-            model_path: Path = self._model_folder_path / self._model_information.fileName
-            logger.debug(f"Loading model from path: {model_path}")
             self._model = Llama(
                 model_path=str(model_path.absolute()),
-                n_ctx=0,  # text context, 0 = from a model
-                n_gpu_layers=-1,  # Load all layers to GPU
-                n_threads=8,  # Number of threads to use for generation
-                use_mlock=True,  # Force the system to keep the model in RAM.
-                verbose=False  # Print verbose output to stderr.
+                n_ctx=0,  # Context length from model
+                n_gpu_layers=-1,  # Use GPU for all layers
+                n_threads=8,  # Generation threads
+                use_mlock=True,  # Keep in RAM
+                verbose=False  # Suppress verbose output
+            )
+            logger.info(
+                "load_model: Successfully loaded model '%s'",
+                self._model_information.name
             )
         except Exception as e:
-            logger.error(f"Failed to load model: {str(e)}", exc_info=True)
+            logger.error(
+                "load_model: Failed to load model '%s'",
+                self._model_information.name,
+                exc_info=True
+            )
             raise RuntimeError(f"Failed to load model: {str(e)}") from e
 
     def unload_model(self) -> None:
+        """Unload model from memory if loaded."""
         if not self.is_model_loaded():
-            logger.info("No model to unload")
+            logger.info("unload_model: No model loaded - nothing to unload")
             return
+
+        logger.debug("unload_model: Unloading model '%s'", self._model_information.name)
         try:
             del self._model
             self._model = None
-            logger.info("Model unloaded successfully")
+            logger.info("unload_model: Model successfully unloaded")
         except Exception as e:
-            logger.warning(f"Failed to unload model: {str(e)}", exc_info=True)
+            logger.warning(
+                "unload_model: Failed to unload model '%s'",
+                self._model_information.name,
+                e,
+                exc_info=True,
+            )
             self._model = None
 
     def generate_response(self, request: GenerationRequest) -> GenerationResponse:
+        """Generate response using loaded model."""
         if not self.is_model_loaded():
+            logger.info(
+                "generate_response: Model not loaded - loading '%s'",
+                self._model_information.name
+            )
             self.load_model()
 
-        try:
-            logger.debug(f"Generating response for request: {request}")
+        # Log request parameters without sensitive data
+        logger.debug(
+            "generate_response: Starting generation - system_len=%d, user_len=%d, temp=%.2f, top_k=%d, top_p=%.2f, min_p=%.2f",
+            len(request.system_prompt),
+            len(request.user_prompt),
+            request.temperature,
+            request.top_k,
+            request.top_p,
+            request.min_p
+        )
 
+        try:
             messages: list[ChatCompletionRequestMessage] = [
                 ChatCompletionRequestSystemMessage(role="system", content=request.system_prompt),
                 ChatCompletionRequestUserMessage(role="user", content=request.user_prompt),
             ]
+
             response = self._model.create_chat_completion(
                 messages=messages,
                 temperature=request.temperature,
@@ -76,23 +126,25 @@ class LlamaCppModelService(ModelService):
                 top_p=request.top_p,
                 min_p=request.min_p,
             )
-            logger.debug(f"Response: {response}")
-            generated_text = response["choices"][0]["message"]["content"].strip()
 
-            logger.info(f"Generated {len(generated_text)} characters")
+            generated_text = response["choices"][0]["message"]["content"].strip()
+            logger.info(
+                "generate_response: Generated %d characters",
+                len(generated_text)
+            )
 
             return GenerationResponse(
                 text_content=generated_text,
                 metadata={
-                    "prompt_tokens": response["usage"]["prompt_tokens"],
-                    "completion_tokens": response["usage"]["completion_tokens"],
-                    "total_tokens": response["usage"]["total_tokens"],
                     "model_name": self._model_information.name,
                 },
                 original_request=request,
             )
 
         except Exception as e:
-            error_msg = f"Failed to generate response: {str(e)}"
-            logger.error(error_msg, exc_info=True)
-            raise RuntimeError(error_msg) from e
+            logger.error(
+                "generate_response: Generation failed for model '%s'",
+                self._model_information.name,
+                exc_info=True
+            )
+            raise RuntimeError(f"Failed to generate response: {str(e)}") from e

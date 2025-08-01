@@ -1,5 +1,7 @@
+import logging
 from typing import Optional
 
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtWidgets import (
     QTabWidget,
     QWidget,
@@ -8,27 +10,76 @@ from PyQt6.QtWidgets import (
 
 from context import AppContext
 from core.models.enums.prompt import PromptCategory
-from ui.content.tab_widgets.action_controls_widget import ActionControlsWidget
+from ui.content.tab_widgets.action_controls_widget import ActionControlsWidget, ActionEvent
+
+logger = logging.getLogger(__name__)
 
 
 class ActionTabsWidget(QTabWidget):
+    action_button_clicked = pyqtSignal(ActionEvent)
+
     def __init__(self, ctx: AppContext, parent: Optional[QWidget] = None) -> None:
-        super().__init__()
+        super().__init__(parent)
+
+        # Log initialization with key metrics
+        proofreading_prompts = ctx.prompt_service.get_prompts_by_category(PromptCategory.PROOFREAD)
+        formatting_prompts = ctx.prompt_service.get_prompts_by_category(PromptCategory.FORMAT)
+        translation_prompts = ctx.prompt_service.get_prompts_by_category(PromptCategory.TRANSLATE)
+
+        logger.debug(
+            "__init__: Initializing with %d proofreading, %d formatting, and %d translation prompts",
+            len(proofreading_prompts),
+            len(formatting_prompts),
+            len(translation_prompts)
+        )
+
         self.setSizePolicy(
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding
         )
         self._proofreading_tab = ActionControlsWidget(
-            prompts=ctx.prompt_service.get_prompts_by_category(PromptCategory.PROOFREAD)
+            ctx=ctx,
+            prompts=proofreading_prompts
         )
         self._format_tab = ActionControlsWidget(
-            prompts=ctx.prompt_service.get_prompts_by_category(PromptCategory.FORMAT)
+            ctx=ctx,
+            prompts=formatting_prompts
         )
         self._translate_tab = ActionControlsWidget(
-            prompts=ctx.prompt_service.get_prompts_by_category(PromptCategory.TRANSLATE),
+            ctx=ctx,
+            prompts=translation_prompts,
             input_dropdown_items=ctx.supported_languages_service.get_supported_translation_languages(),
             output_dropdown_items=ctx.supported_languages_service.get_supported_translation_languages(),
         )
         self.addTab(self._proofreading_tab, "Proofreading")
         self.addTab(self._format_tab, "Formatting")
         self.addTab(self._translate_tab, "Translating")
+
+        self._proofreading_tab.button_clicked.connect(self._on_action_btn_clicked)
+        self._format_tab.button_clicked.connect(self._on_action_btn_clicked)
+        self._translate_tab.button_clicked.connect(self._on_action_btn_clicked)
+
+        ctx.task_service.subscribe_global_busy_state_changed(self._set_widget_enabled)
+        logger.debug(
+            "__init__: Action tabs initialized - %d tabs created",
+            self.count()
+        )
+
+    def _set_widget_enabled(self, running: bool) -> None:
+        """Update widget state based on task service busy status."""
+        enabled = not running
+        self.setEnabled(enabled)
+        logger.debug(
+            "_set_widget_enabled: Widget state set to %s (running=%s)",
+            "ENABLED" if enabled else "DISABLED",
+            running
+        )
+
+    def _on_action_btn_clicked(self, action: ActionEvent) -> None:
+        """Handle action button click events."""
+        logger.debug(
+            "_on_action_btn_clicked: Button '%s' clicked (prompt: '%s')",
+            action.action_id,
+            action.prompt.name
+        )
+        self.action_button_clicked.emit(action)

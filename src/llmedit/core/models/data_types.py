@@ -40,7 +40,7 @@ class GenerationResponse:
 @dataclass(frozen=True)
 class TaskResult:
     id: str
-    task_result: Any
+    task_result_content: Any
     has_error: bool = False
     error_message: str = ''
     exception: Optional[Exception] = None

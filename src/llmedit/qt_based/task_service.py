@@ -1,3 +1,4 @@
+import logging
 from abc import ABCMeta
 from typing import Callable, Dict, Set
 
@@ -6,39 +7,55 @@ from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 from core.interfaces.background.task_service import TaskService
 from core.models.data_types import TaskInput, TaskResult
 
-
-class WorkerSignals(QObject):
-    """
-    Defines the signals available from a running worker thread.
-    """
-    finished = pyqtSignal(object)  # emits TaskResult
+logger = logging.getLogger(__name__)
 
 
 class TaskRunnable(QRunnable):
-    def __init__(self, task_input: TaskInput):
+    def __init__(self, task_input: TaskInput, callback: Callable[[TaskResult], None]):
         super().__init__()
         self.task_input = task_input
-        self.signals = WorkerSignals()
+        self.callback = callback
         self.setAutoDelete(True)
+        logger.debug(
+            "TaskRunnable: Initialized task '%s'",
+            self.task_input.id
+        )
 
     def run(self):
+        logger.debug(
+            "TaskRunnable.run: Executing task '%s'",
+            self.task_input.id
+        )
         result = None
         try:
             value = self.task_input.task_func()
             result = TaskResult(
                 id=self.task_input.id,
-                task_result=value,
+                task_result_content=value,
+            )
+            logger.debug(
+                "TaskRunnable.run: Task '%s' completed successfully",
+                self.task_input.id
             )
         except Exception as exc:
+            logger.warning(
+                "TaskRunnable.run: Task '%s' failed with error: %s",
+                self.task_input.id,
+                str(exc)
+            )
             result = TaskResult(
                 id=self.task_input.id,
-                task_result=None,
+                task_result_content=None,
                 has_error=True,
                 error_message=str(exc),
                 exception=exc
             )
         finally:
-            self.signals.finished.emit(result)
+            self.callback(result)
+            logger.debug(
+                "TaskRunnable.run: Result for task '%s' delivered to callback",
+                self.task_input.id
+            )
 
 
 class _MetaQObjectABC(type(QObject), ABCMeta):
@@ -46,6 +63,7 @@ class _MetaQObjectABC(type(QObject), ABCMeta):
 
 
 class TaskServiceImpl(TaskService, QObject, metaclass=_MetaQObjectABC):
+    task_result_ready = pyqtSignal(TaskResult)
     _global_task_finished = pyqtSignal(object)
     _global_busy_state_changed = pyqtSignal(bool)
 
@@ -56,57 +74,144 @@ class TaskServiceImpl(TaskService, QObject, metaclass=_MetaQObjectABC):
         self._pool = thread_pool
         self._running: Dict[str, TaskRunnable] = {}
         self._canceled: Set[str] = set()
+        self._per_task_callbacks: Dict[str, Callable[[TaskResult], None]] = {}
+
+        self.task_result_ready.connect(self._on_task_result_ready)
+        logger.debug(
+            "TaskServiceImpl: Initialized with thread pool (max threads=%d)",
+            self._pool.maxThreadCount()
+        )
 
     def submit_task(self, task_input: TaskInput) -> None:
-        runnable = TaskRunnable(task_input)
         task_id = task_input.id
+        logger.debug(
+            "submit_task: Submitting task '%s'",
+            task_id
+        )
 
-        # connect per-task callback
-        runnable.signals.finished.connect(lambda result: task_input.on_task_finished(result))
-        # connect global handler
-        runnable.signals.finished.connect(self._on_task_finished)
+        self._per_task_callbacks[task_id] = task_input.on_task_finished
+        runnable = TaskRunnable(
+            task_input,
+            callback=lambda result: self.task_result_ready.emit(result)
+        )
 
-        # track and start
+        # Track and start
         self._running[task_id] = runnable
-        if len(self._running) > 0:
+        if len(self._running) == 1:  # Transition from idle to busy
+            logger.debug("submit_task: System transitioned to BUSY state")
             self._global_busy_state_changed.emit(True)
 
         self._pool.start(runnable)
+        logger.debug(
+            "submit_task: Task '%s' started (active tasks=%d)",
+            task_id,
+            len(self._running)
+        )
 
     def cancel_task(self, task_id: str) -> bool:
         """
         Logically cancel a task: its callbacks (global and per-task) will be suppressed.
         """
         if task_id in self._running:
+            logger.warning(
+                "cancel_task: Canceling task '%s' (was running)",
+                task_id
+            )
             self._canceled.add(task_id)
+            return True
+        elif task_id in self._per_task_callbacks:
+            logger.warning(
+                "cancel_task: Canceling task '%s' (queued)",
+                task_id
+            )
+            # Remove from callbacks but not running (not yet started)
+            del self._per_task_callbacks[task_id]
             return True
         return False
 
     def cancel_all_tasks(self) -> None:
+        count = len(self._running) + len(self._per_task_callbacks)
+        if count > 0:
+            logger.warning(
+                "cancel_all_tasks: Canceling %d active and queued tasks",
+                count
+            )
         for tid in list(self._running.keys()):
             self._canceled.add(tid)
+        self._per_task_callbacks.clear()
 
     def is_busy(self) -> bool:
-        return bool(self._running)
+        busy = bool(self._running)
+        logger.debug(
+            "is_busy: System is %s",
+            "BUSY" if busy else "IDLE"
+        )
+        return busy
 
     def subscribe_global_task_finished(self, listener: Callable[[TaskResult], None]) -> None:
+        logger.debug(
+            "subscribe_global_task_finished: New global listener registered (%s)",
+            listener.__qualname__
+        )
         self._global_task_finished.connect(listener)
 
     def subscribe_global_busy_state_changed(self, listener: Callable[[bool], None]) -> None:
+        logger.debug(
+            "subscribe_global_busy_state_changed: New busy state listener registered (%s)",
+            listener.__qualname__
+        )
         self._global_busy_state_changed.connect(listener)
+
+    def _on_task_result_ready(self, result: TaskResult):
+        task_id = result.id
+        logger.debug(
+            "_on_task_result_ready: Result received for task '%s' (success=%s)",
+            task_id,
+            not result.has_error
+        )
+
+        callback = self._per_task_callbacks.pop(task_id, None)
+        try:
+            if callback:
+                logger.debug(
+                    "_on_task_result_ready: Executing per-task callback for '%s'",
+                    task_id
+                )
+                callback(result)
+        finally:
+            self._on_task_finished(result)
 
     def _on_task_finished(self, result: TaskResult):
         task_id = result.id
+        logger.debug(
+            "_on_task_finished: Finalizing task '%s'",
+            task_id
+        )
 
-        # remove from running
+        # Remove from running
         self._running.pop(task_id, None)
-        # busy→idle transition
-        if not len(self._running):
+
+        # Busy→idle transition
+        if not self._running:
+            logger.debug("_on_task_finished: System transitioned to IDLE state")
             self._global_busy_state_changed.emit(False)
 
-        # only emit if not canceled
+        # Only emit if not canceled
         if task_id not in self._canceled:
+            logger.debug(
+                "_on_task_finished: Emitting global completion for task '%s'",
+                task_id
+            )
             self._global_task_finished.emit(result)
+        else:
+            logger.debug(
+                "_on_task_finished: Skipping global emit for canceled task '%s'",
+                task_id
+            )
 
-        # clean up a cancel flag
+        # Clean up cancel flag
         self._canceled.discard(task_id)
+        logger.debug(
+            "_on_task_finished: Cleanup complete for task '%s'",
+            task_id
+        )

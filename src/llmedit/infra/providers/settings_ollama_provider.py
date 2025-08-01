@@ -11,17 +11,35 @@ logger = logging.getLogger(__name__)
 
 class SettingsOllamaProvider(SettingsLLMProvider):
     def get_model_list(self) -> List[LlmModel]:
-        logger.debug("Getting list of models")
-        response = ollama.list()
-        logger.debug(f"Response: {response}")
+        """Retrieve available models from Ollama service."""
+        logger.debug("get_model_list: Starting model list retrieval from Ollama")
+
+        try:
+            response = ollama.list()
+            logger.debug("get_model_list: Ollama API responded with %d models", len(response["models"]))
+        except Exception as e:
+            logger.error("get_model_list: Failed to connect to Ollama service", exc_info=True)
+            raise e
+
         model_names = [model["model"] for model in response["models"]]
-        models: List[LlmModel] = []
-        for model_name in model_names:
-            model = LlmModel(
+
+        # Log model names safely (truncated for long lists)
+        if model_names:
+            sample = ", ".join(model_names[:5])
+            suffix = f" ... ({len(model_names) - 5} more)" if len(model_names) > 5 else ""
+            logger.debug("get_model_list: Found models: %s%s", sample, suffix)
+        else:
+            logger.debug("get_model_list: No models found in Ollama")
+
+        models = [
+            LlmModel(
                 id=model_name,
                 name=model_name,
                 is_available=True
-            )
-            models.append(model)
-        logger.debug(f"Models: {models}")
+            ) for model_name in model_names
+        ]
+
+        models.sort(key=lambda x: x.name)
+
+        logger.debug("get_model_list: Prepared %d model objects for return", len(models))
         return models

@@ -1,13 +1,22 @@
+import logging
 from typing import Optional
 
 from PyQt6.QtWidgets import (
-    QWidget, QLabel, QToolButton, QTextEdit, QSizePolicy, QHBoxLayout, QFrame, QVBoxLayout, QApplication
+    QWidget, QLabel, QToolButton, QTextEdit, QSizePolicy, QHBoxLayout, QVBoxLayout, QApplication
 )
 
+from context import AppContext
+from ui.base_widget import BaseWidget
 
-class TextInteractionAreasWidget(QWidget):
-    def __init__(self, parent: Optional[QWidget] = None) -> None:
-        super().__init__(parent)
+logger = logging.getLogger(__name__)
+
+
+class TextInteractionAreasWidget(BaseWidget):
+    def __init__(self, ctx: AppContext, parent: Optional[QWidget] = None) -> None:
+        super().__init__(ctx, parent)
+
+        logger.debug("__init__: Initializing text interaction areas")
+
         self._input_header = QLabel("Input")
         self._input_header.setStyleSheet("font-weight: bold;")
 
@@ -15,6 +24,7 @@ class TextInteractionAreasWidget(QWidget):
         self._paste_button.setText("📋 Paste")
         self._paste_button.setToolTip("Paste text from clipboard")
         self._paste_button.clicked.connect(self._paste_from_clipboard)
+        logger.debug("__init__: Paste button initialized")
 
         self._input_text = QTextEdit()
         self._input_text.setAcceptRichText(False)
@@ -22,6 +32,7 @@ class TextInteractionAreasWidget(QWidget):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding
         )
+        logger.debug("__init__: Input text area initialized")
 
         self._output_header = QLabel("Output")
         self._output_header.setStyleSheet("font-weight: bold;")
@@ -30,6 +41,7 @@ class TextInteractionAreasWidget(QWidget):
         self._copy_button.setText("📋 Copy")
         self._copy_button.setToolTip("Copy text to clipboard")
         self._copy_button.clicked.connect(self._copy_to_clipboard)
+        logger.debug("__init__: Copy button initialized")
 
         self._output_text = QTextEdit()
         self._output_text.setReadOnly(True)
@@ -38,6 +50,7 @@ class TextInteractionAreasWidget(QWidget):
             QSizePolicy.Policy.Expanding,
             QSizePolicy.Policy.Expanding
         )
+        logger.debug("__init__: Output text area initialized (read-only)")
 
         layout = QHBoxLayout(self)
         layout.setContentsMargins(8, 8, 8, 8)
@@ -59,7 +72,14 @@ class TextInteractionAreasWidget(QWidget):
         )
         layout.addLayout(output_layout)
 
+        logger.debug(
+            "__init__: Text interaction areas initialized with %d sections",
+            layout.count()
+        )
+
     def _create_section_layout(self, header: QLabel, action_button: QToolButton, text_area: QTextEdit) -> QVBoxLayout:
+        logger.debug("_create_section_layout: Creating text section")
+
         section_layout = QVBoxLayout()
         section_layout.setContentsMargins(0, 0, 0, 0)
         section_layout.setSpacing(4)
@@ -74,37 +94,80 @@ class TextInteractionAreasWidget(QWidget):
         # Text area
         section_layout.addWidget(text_area)
 
+        logger.debug(
+            "_create_section_layout: Section created with %s header",
+            header.text()
+        )
         return section_layout
 
     def _paste_from_clipboard(self) -> None:
         """Paste text from system clipboard into input area."""
-        clipboard = QApplication.clipboard()
+        logger.debug("_paste_from_clipboard: Paste operation started")
 
+        clipboard = QApplication.clipboard()
         if clipboard and clipboard.text():
             text = clipboard.text()
+            logger.debug(
+                "_paste_from_clipboard: Pasting %d characters from clipboard",
+                len(text)
+            )
             self.set_input_text(text)
+        else:
+            logger.debug("_paste_from_clipboard: Clipboard is empty")
 
     def _copy_to_clipboard(self) -> None:
         """Copy text from output area to system clipboard."""
+        logger.debug("_copy_to_clipboard: Copy operation started")
+
         clipboard = QApplication.clipboard()
         text = self.output_text()
         if text and clipboard:
+            logger.debug(
+                "_copy_to_clipboard: Copying %d characters to clipboard",
+                len(text)
+            )
             clipboard.setText(text)
+        else:
+            logger.debug("_copy_to_clipboard: No text to copy")
 
     def set_input_text(self, text: str) -> None:
+        logger.debug(
+            "set_input_text: Setting %d characters in input area",
+            len(text)
+        )
         self._input_text.setPlainText(text)
 
     def input_text(self) -> str:
-        return self._input_text.toPlainText()
+        text = self._input_text.toPlainText()
+        logger.debug(
+            "input_text: Returning %d characters from input area",
+            len(text)
+        )
+        return text
 
     def set_output_text(self, text: str) -> None:
+        logger.debug(
+            "set_output_text: Setting %d characters in output area",
+            len(text)
+        )
         self._output_text.setPlainText(text)
 
     def output_text(self) -> str:
-        return self._output_text.toPlainText()
+        text = self._output_text.toPlainText()
+        logger.debug(
+            "output_text: Returning %d characters from output area",
+            len(text)
+        )
+        return text
 
-    def set_enabled(self, enabled: bool) -> None:
+    def on_widgets_enabled_changed(self, enabled: bool) -> None:
+        state = "ENABLED" if enabled else "DISABLED"
+        logger.debug(
+            "on_widgets_enabled_changed: Setting text areas to %s",
+            state
+        )
+
         self._input_text.setEnabled(enabled)
-        self._output_text.setEnabled(enabled and not self._output_text.isReadOnly())
+        self._output_text.setEnabled(enabled)
         self._paste_button.setEnabled(enabled)
         self._copy_button.setEnabled(enabled)
