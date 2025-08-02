@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -12,8 +13,8 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from context import AppContext
-from ui.base_widget import BaseWidget
+from llmedit.context import AppContext
+from llmedit.ui.base_widget import BaseWidget
 
 logger = logging.getLogger(__name__)
 
@@ -121,8 +122,22 @@ class TextInteractionAreasWidget(BaseWidget):
             )
             raise
 
+        self.setObjectName("textInteractionAreasWidget")
+        self._input_header.setObjectName("textInteractionAreaHeader")
+        self._input_text.setObjectName("textInteractionAreaInputText")
+        self._output_header.setObjectName("textInteractionAreaHeader")
+        self._output_text.setObjectName("textInteractionAreaOutputText")
+        self._clear_button.setObjectName("textInteractionAreaClearButton")
+        self._paste_button.setObjectName("textInteractionAreaPasteButton")
+        self._copy_button.setObjectName("textInteractionAreaCopyButton")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
     @staticmethod
-    def _create_section_layout(header: QLabel, action_button: QToolButton, text_area: QTextEdit, clear_button: Optional[QToolButton] = None) -> QVBoxLayout:
+    def _create_section_layout(header: QLabel,
+                               action_button: QToolButton,
+                               text_area: QTextEdit,
+                               clear_button: Optional[QToolButton] = None,
+                               ) -> QVBoxLayout:
         """
         Create a labeled section with header, action button, and text area.
 

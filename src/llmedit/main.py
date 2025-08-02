@@ -4,9 +4,9 @@ from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication
 
-from context import create_context
-from theme.loader import load_stylesheet
-from ui.main_window import MainWindow
+from llmedit.context import create_context
+from llmedit.theme.loader import load_stylesheet
+from llmedit.ui.main_window import MainWindow
 
 
 def configure_logger(log_level: int = logging.INFO) -> None:

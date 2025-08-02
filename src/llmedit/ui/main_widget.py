@@ -2,13 +2,13 @@ import logging
 from typing import Optional
 
 from PyQt6.QtWidgets import (QDialog, QSizePolicy, QVBoxLayout, QWidget)
-
-from context import AppContext
-from ui.base_widget import BaseWidget
-from ui.content.bottom_widget import BottomBarWidget
-from ui.content.central_widget import CentralWidget
-from ui.content.top_widget import TopBarWidget
-from ui.settings.settings_dialog import SettingsDialog
+from PyQt6.QtCore import Qt
+from llmedit.context import AppContext
+from llmedit.ui.base_widget import BaseWidget
+from llmedit.ui.content.bottom_widget import BottomBarWidget
+from llmedit.ui.content.central_widget import CentralWidget
+from llmedit.ui.content.top_widget import TopBarWidget
+from llmedit.ui.settings.settings_dialog import SettingsDialog
 
 logger = logging.getLogger(__name__)
 
@@ -69,6 +69,8 @@ class MainWidget(BaseWidget):
             "__init__: Main widget initialized with %d layout elements",
             layout.count(),
         )
+        self.setObjectName("mainWidget")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
     def _on_settings_clicked(self) -> None:
         """

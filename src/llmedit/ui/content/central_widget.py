@@ -2,15 +2,16 @@ import logging
 from typing import Optional
 
 from PyQt6 import QtWidgets
+from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QMessageBox, QSizePolicy, QVBoxLayout, QWidget)
 
-from config.application_prompts import PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE, PROMPT_PARAM_USER_TEXT
-from context import AppContext
-from core.models.data_types import ProcessingContext, TaskInput, TaskResult
-from ui.base_widget import BaseWidget
-from ui.content.tab_widgets.action_controls_widget import ActionEvent
-from ui.content.tab_widgets.action_tabs_widget import ActionTabsWidget
-from ui.content.text_widgets.text_interaction_areas_widget import TextInteractionAreasWidget
+from llmedit.config.application_prompts import PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE, PROMPT_PARAM_USER_TEXT
+from llmedit.context import AppContext
+from llmedit.core.models.data_types import ProcessingContext, TaskInput, TaskResult
+from llmedit.ui.base_widget import BaseWidget
+from llmedit.ui.content.tab_widgets.action_controls_widget import ActionEvent
+from llmedit.ui.content.tab_widgets.action_tabs_widget import ActionTabsWidget
+from llmedit.ui.content.text_widgets.text_interaction_areas_widget import TextInteractionAreasWidget
 
 logger = logging.getLogger(__name__)
 
@@ -48,8 +49,8 @@ class CentralWidget(BaseWidget):
             self._tabs = ActionTabsWidget(ctx)
 
             layout = QVBoxLayout()
-            layout.addWidget(self._text_widget, 8)
-            layout.addWidget(self._tabs, 2)
+            layout.addWidget(self._text_widget, 7)
+            layout.addWidget(self._tabs, 3)
             self.setLayout(layout)
 
             self.setSizePolicy(
@@ -70,6 +71,9 @@ class CentralWidget(BaseWidget):
                 exc_info=True,
             )
             raise
+
+        self.setObjectName("centralWidget")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
     def on_widgets_enabled_changed(self, enabled: bool) -> None:
         """

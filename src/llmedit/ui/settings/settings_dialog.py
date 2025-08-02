@@ -1,10 +1,21 @@
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, QFormLayout, QLabel, QSlider, QVBoxLayout)
+from typing import List
 
-from context import AppContext
-from core.interfaces.settings.settings_service import SettingsService
-from core.models.enums.llm_provider_type import LlmProviderType
-from core.models.settings import SettingsState
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QLabel,
+    QSlider,
+    QVBoxLayout,
+)
+
+from llmedit.context import AppContext
+from llmedit.core.interfaces.settings.settings_service import SettingsService
+from llmedit.core.models.enums.llm_provider_type import LlmProviderType
+from llmedit.core.models.settings import SettingsState
 
 
 class SettingsDialog(QDialog):
@@ -38,8 +49,10 @@ class SettingsDialog(QDialog):
         main_layout.addLayout(form_layout)
 
         self.provider_combo = QComboBox()
+
         for provider in self._settings_service.get_llm_provider_list():
             self.provider_combo.addItem(provider.value, provider)
+
         idx = self.provider_combo.findData(self._state.llm_provider)
         if idx >= 0:
             self.provider_combo.setCurrentIndex(idx)
@@ -71,12 +84,41 @@ class SettingsDialog(QDialog):
         self.temp_slider.setProperty("tempSlider", True)
         form_layout.addRow(QLabel("Temperature:"), self.temp_slider)
 
+        languages: List[str] = app_context.supported_languages_service.get_supported_translation_languages()
+
+        self.source_language_combo = QComboBox()
+        self.source_language_combo.setEditable(True)
+        self.source_language_combo.addItems(languages)
+        self.source_language_combo.setCurrentText(self._settings_service.get_source_language())
+        form_layout.addRow(QLabel("Source Language:"), self.source_language_combo)
+
+        self.target_language_combo = QComboBox()
+        self.target_language_combo.setEditable(True)
+        self.target_language_combo.addItems(languages)
+        self.target_language_combo.setCurrentText(self._settings_service.get_target_language())
+        form_layout.addRow(QLabel("Target Language:"), self.target_language_combo)
+
         self.temp_check.toggled.connect(self.temp_slider.setEnabled)
 
-        btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
-        btn_box.accepted.connect(self._on_save)
-        btn_box.rejected.connect(self.reject)
-        main_layout.addWidget(btn_box)
+        self.btn_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Save | QDialogButtonBox.StandardButton.Cancel)
+        self.btn_box.accepted.connect(self._on_save)
+        self.btn_box.rejected.connect(self.reject)
+        save_button = self.btn_box.button(QDialogButtonBox.StandardButton.Save)
+        save_button.setObjectName("saveButton")
+        cancel_button = self.btn_box.button(QDialogButtonBox.StandardButton.Cancel)
+        cancel_button.setObjectName("cancelButton")
+        main_layout.addWidget(self.btn_box)
+
+        self.setObjectName("settingsDialog")
+        self.provider_combo.setObjectName("settingsProviderCombo")
+        self.model_combo.setObjectName("settingsModelCombo")
+        self.source_language_combo.setObjectName("settingsSourceLanguageCombo")
+        self.target_language_combo.setObjectName("settingsTargetLanguageCombo")
+        self.temp_slider.setObjectName("settingsTempSlider")
+        self.temp_check.setObjectName("settingsTempCheckBox")
+        self.btn_box.setObjectName("settingsBtnBox")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
 
     def _reload_models(self):
         """
@@ -119,5 +161,7 @@ class SettingsDialog(QDialog):
         temp = self.temp_slider.value() / 100.0
         self._settings_service.set_llm_temperature_enabled(enabled)
         self._settings_service.set_llm_temperature(temp)
+        self._settings_service.set_source_language(self.source_language_combo.currentText())
+        self._settings_service.set_target_language(self.target_language_combo.currentText())
 
         self.accept()

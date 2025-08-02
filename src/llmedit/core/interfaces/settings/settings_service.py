@@ -154,3 +154,21 @@ class SettingsService(ABC):
         Notes:
             Does not change the stored temperature value.
         """
+
+    @abstractmethod
+    def set_source_language(self, value: str) -> None:
+        """
+        Set the default source language"""
+
+    @abstractmethod
+    def set_target_language(self, value: str) -> None:
+        """
+        Set the default target language"""
+
+    @abstractmethod
+    def get_source_language(self) -> str:
+        """Get the default source language"""
+
+    @abstractmethod
+    def get_target_language(self) -> str:
+        """Get the default source language"""

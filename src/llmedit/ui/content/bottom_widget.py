@@ -31,8 +31,14 @@ class BottomBarWidget(QWidget):
         super().__init__(parent)
         logger.debug("__init__: Initializing bottom status bar")
 
+        self._provider_label = QLabel("Provider: ")
+        self._model_label = QLabel("Model: ")
+        self._task_status_label = QLabel("Tasks: ")
+        self._initialization_status_label = QLabel("")
+        label_count = 4
+        logger.debug("_setup_ui: Created %d status labels", label_count)
+
         try:
-            self._setup_ui()
             self._configure_layout()
             logger.debug("__init__: Bottom status bar initialized with %d status elements", self.layout().count())
         except Exception as e:
@@ -42,35 +48,14 @@ class BottomBarWidget(QWidget):
                 exc_info=True,
             )
             raise
-        self.setObjectName("bottom-bar")
-        self._initialization_status_label.setObjectName("bottom-bar-initialization-status")
+        self.setObjectName("bottomBar")
+        self._initialization_status_label.setObjectName("bottomBarInitializationStatus")
+        self._provider_label.setObjectName("bottomBarProviderStatus")
+        self._model_label.setObjectName("bottomBarModelStatus")
+        self._task_status_label.setObjectName("bottomBarTaskStatus")
+        self._initialization_status_label.setObjectName("bottomBarInitializationStatusLabel")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
-    def _setup_ui(self) -> None:
-        """
-        Initialize all UI components with default states.
-
-        Notes:
-            Creates four QLabel instances for provider, model, task status, and initialization status.
-            Labels are created with initial placeholder text.
-        """
-        try:
-            logger.debug("_setup_ui: Creating status labels")
-
-            self._provider_label = QLabel("Provider: ")
-            self._model_label = QLabel("Model: ")
-            self._task_status_label = QLabel("Tasks: ")
-            self._initialization_status_label = QLabel("")
-
-            label_count = 4
-            logger.debug("_setup_ui: Created %d status labels", label_count)
-        except Exception as e:
-            logger.error(
-                "_setup_ui: Failed to setup UI components: %s",
-                str(e),
-                exc_info=True,
-            )
-            raise
 
     def _configure_layout(self) -> None:
         """

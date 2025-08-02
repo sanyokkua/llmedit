@@ -4,9 +4,9 @@ from typing import Optional
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (QSizePolicy, QTabWidget, QWidget)
 
-from context import AppContext
-from core.models.enums.prompt_category import PromptCategory
-from ui.content.tab_widgets.action_controls_widget import ActionControlsWidget, ActionEvent
+from llmedit.context import AppContext
+from llmedit.core.models.enums.prompt_category import PromptCategory
+from llmedit.ui.content.tab_widgets.action_controls_widget import ActionControlsWidget, ActionEvent
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,7 @@ class ActionTabsWidget(QTabWidget):
 
             self.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
-                QSizePolicy.Policy.Expanding,
+                QSizePolicy.Policy.Minimum,
             )
 
             self._proofreading_tab = ActionControlsWidget(
@@ -91,8 +91,9 @@ class ActionTabsWidget(QTabWidget):
                 exc_info=True,
             )
             raise
-        self.setObjectName("action-tabs-widget")
+        self.setObjectName("actionTabsWidget")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+
 
     def _set_widget_enabled(self, running: bool) -> None:
         """

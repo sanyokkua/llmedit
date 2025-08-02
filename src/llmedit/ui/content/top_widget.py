@@ -4,8 +4,8 @@ from typing import Optional
 from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (QHBoxLayout, QLabel, QPushButton, QSizePolicy, QWidget)
 
-from context import AppContext
-from ui.base_widget import BaseWidget
+from llmedit.context import AppContext
+from llmedit.ui.base_widget import BaseWidget
 
 logger = logging.getLogger(__name__)
 
@@ -59,9 +59,9 @@ class TopBarWidget(BaseWidget):
             )
             raise
 
-        self.setObjectName("app-bar")
-        self._app_label.setObjectName("app-bar-title-link")
-        self._settings_button.setObjectName("app-bar-settings-button")
+        self.setObjectName("appTopBar")
+        self._app_label.setObjectName("appTopBarTitleLink")
+        self._settings_button.setObjectName("appTopBarSettingsButton")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
     def _configure_layout(self) -> None:

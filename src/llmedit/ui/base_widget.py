@@ -2,8 +2,8 @@ import logging
 from typing import Optional
 
 from PyQt6.QtWidgets import QWidget
-
-from context import AppContext
+from PyQt6.QtCore import Qt
+from llmedit.context import AppContext
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,8 @@ class BaseWidget(QWidget):
         logger.debug(
             "__init__: Subscribed to settings updates and task service (busy state tracking)",
         )
+        self.setObjectName("baseWidget")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
     def on_widget_initialization_complete(self) -> None:
         """

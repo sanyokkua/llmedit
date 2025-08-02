@@ -15,6 +15,8 @@ class SettingsState:
     llm_model_name: Optional[str]
     llm_temperature: float
     llm_temperature_enabled: bool
+    source_language: str
+    target_language: str
 
 
 @dataclass(frozen=True)

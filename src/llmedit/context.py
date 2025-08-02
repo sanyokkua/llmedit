@@ -4,21 +4,21 @@ from typing import Callable
 
 from PyQt6.QtCore import QObject, QThreadPool, pyqtSignal
 
-from application.services.default_supported_translation_languages_service import \
+from llmedit.application.services.default_supported_translation_languages_service import \
     DefaultSupportedTranslationLanguagesService
-from application.services.app_prompt_service import AppPromptService
-from application.services.text_processing_service_base import TextProcessingServiceBase
-from application.services.reasoning_text_sanitization_service import ReasoningTextSanitizationService
-from config.in_memory_settings_service import InMemorySettingsService
-from core.interfaces.background.task_service import TaskService
-from core.interfaces.processing.supported_translation_languages_service import SupportedTranslationLanguagesService
-from core.interfaces.processing.text_processing_service import TextProcessingService
-from core.interfaces.prompt.prompt_service import PromptService
-from core.interfaces.settings.settings_service import SettingsService
-from infra.providers.settings_llamacpp_provider import SettingsLlamaCppProvider
-from infra.providers.settings_ollama_provider import SettingsOllamaProvider
-from infra.providers.standard_model_service_provider import StandardModelServiceProvider
-from qt_based.task_service_impl import TaskServiceImpl
+from llmedit.application.services.app_prompt_service import AppPromptService
+from llmedit.application.services.text_processing_service_base import TextProcessingServiceBase
+from llmedit.application.services.reasoning_text_sanitization_service import ReasoningTextSanitizationService
+from llmedit.config.in_memory_settings_service import InMemorySettingsService
+from llmedit.core.interfaces.background.task_service import TaskService
+from llmedit.core.interfaces.processing.supported_translation_languages_service import SupportedTranslationLanguagesService
+from llmedit.core.interfaces.processing.text_processing_service import TextProcessingService
+from llmedit.core.interfaces.prompt.prompt_service import PromptService
+from llmedit.core.interfaces.settings.settings_service import SettingsService
+from llmedit.infra.providers.settings_llamacpp_provider import SettingsLlamaCppProvider
+from llmedit.infra.providers.settings_ollama_provider import SettingsOllamaProvider
+from llmedit.infra.providers.standard_model_service_provider import StandardModelServiceProvider
+from llmedit.qt_based.task_service_impl import TaskServiceImpl
 
 logger = logging.getLogger(__name__)
 

@@ -209,3 +209,6 @@ __marimo__/
 .idea
 data/models/*.gguf
 data/app.db
+
+.vscode
+*.DS_Store

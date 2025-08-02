@@ -14,9 +14,9 @@ from PyQt6.QtWidgets import (
     QWidget,
 )
 
-from context import AppContext
-from core.models.data_types import Prompt
-from ui.base_widget import BaseWidget
+from llmedit.context import AppContext
+from llmedit.core.models.data_types import Prompt
+from llmedit.ui.base_widget import BaseWidget
 
 logger = logging.getLogger(__name__)
 
@@ -94,25 +94,23 @@ class ActionControlsWidget(BaseWidget):
             dropdown_layout.setSpacing(8)
 
             self._input_dropdown = QComboBox()
-            self._input_dropdown.setEditable(True)
-            self._input_dropdown.setPlaceholderText("Input")
             self._input_dropdown.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Fixed,
             )
             for item in input_dropdown_items or []:
                 self._input_dropdown.addItem(item)
+            self._input_dropdown.setCurrentText(ctx.settings_service.get_source_language())
             dropdown_layout.addWidget(self._input_dropdown)
 
             self._output_dropdown = QComboBox()
-            self._output_dropdown.setEditable(True)
-            self._output_dropdown.setPlaceholderText("Output")
             self._output_dropdown.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
                 QSizePolicy.Policy.Fixed,
             )
             for item in output_dropdown_items or []:
                 self._output_dropdown.addItem(item)
+            self._output_dropdown.setCurrentText(ctx.settings_service.get_target_language())
             dropdown_layout.addWidget(self._output_dropdown)
 
             main_layout.addLayout(dropdown_layout)
@@ -134,7 +132,6 @@ class ActionControlsWidget(BaseWidget):
         self._container = QWidget()
         self._grid = QGridLayout(self._container)
         self._grid.setContentsMargins(0, 0, 0, 0)
-        self._grid.setSpacing(1)
         self._scroll_area.setWidget(self._container)
 
         logger.debug("__init__: Creating %d action buttons", len(prompts))
@@ -154,10 +151,14 @@ class ActionControlsWidget(BaseWidget):
             )
             btn.clicked.connect(lambda checked, e=event: self.button_clicked.emit(e))
             self._buttons[prompt.id] = btn
-        self.setObjectName("action-controls-widget")
+        self.setObjectName("actionControlsWidget")
+        self._scroll_area.setObjectName("actionControlsWidgetScrollArea")
+        if self._input_dropdown:
+            self._input_dropdown.setObjectName("actionControlsWidgetDropdownInput")
+        if self._output_dropdown:
+            self._output_dropdown.setObjectName("actionControlsWidgetDropdownOutput")
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
         self._relayout_buttons()
-
 
     def input_dropdown_value(self) -> str:
         """
@@ -240,7 +241,7 @@ class ActionControlsWidget(BaseWidget):
                 if item and item.widget():
                     self._grid.removeWidget(item.widget())
 
-            cols = 4
+            cols = 3 if len(self._buttons) % 3 == 0 else 2
 
             for idx, btn in enumerate(self._buttons.values()):
                 row = idx // cols

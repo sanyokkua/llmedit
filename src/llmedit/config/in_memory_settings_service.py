@@ -22,6 +22,8 @@ class LlmSettings:
     temperature: float
     temperature_enabled: bool
     inference_timeout: int
+    source_language: str = "English"
+    target_language: str = "Ukrainian"
 
 
 class InMemorySettingsService(SettingsService):
@@ -87,6 +89,8 @@ class InMemorySettingsService(SettingsService):
             llm_model_name=self._settings.model_name,
             llm_temperature=self._settings.temperature,
             llm_temperature_enabled=self._settings.temperature_enabled,
+            source_language=self._settings.source_language,
+            target_language=self._settings.target_language,
         )
 
     def get_llm_provider(self) -> LlmProviderType:
@@ -209,6 +213,8 @@ class InMemorySettingsService(SettingsService):
             temperature=self._settings.temperature,
             temperature_enabled=self._settings.temperature_enabled,
             inference_timeout=self._settings.inference_timeout,
+            source_language=self._settings.source_language,
+            target_language=self._settings.target_language,
         )
 
     def set_llm_model_name(self, value: Optional[str]) -> None:
@@ -228,6 +234,8 @@ class InMemorySettingsService(SettingsService):
             temperature=self._settings.temperature,
             temperature_enabled=self._settings.temperature_enabled,
             inference_timeout=self._settings.inference_timeout,
+            source_language=self._settings.source_language,
+            target_language=self._settings.target_language,
         )
 
     def set_llm_temperature(self, value: float) -> None:
@@ -247,6 +255,8 @@ class InMemorySettingsService(SettingsService):
             temperature=value,
             temperature_enabled=self._settings.temperature_enabled,
             inference_timeout=self._settings.inference_timeout,
+            source_language=self._settings.source_language,
+            target_language=self._settings.target_language,
         )
 
     def set_llm_temperature_enabled(self, value: bool) -> None:
@@ -266,4 +276,42 @@ class InMemorySettingsService(SettingsService):
             temperature=self._settings.temperature,
             temperature_enabled=value,
             inference_timeout=self._settings.inference_timeout,
+            source_language=self._settings.source_language,
+            target_language=self._settings.target_language,
         )
+
+    def set_source_language(self, value: str) -> None:
+        """
+        Set the default source language"""
+        logger.debug("set_source_language: Setting source language to '%s'", value)
+        self._settings = LlmSettings(
+            provider=self._settings.provider,
+            model_name=self._settings.model_name,
+            temperature=self._settings.temperature,
+            temperature_enabled=self._settings.temperature_enabled,
+            inference_timeout=self._settings.inference_timeout,
+            source_language=value,
+            target_language=self._settings.target_language,
+        )
+
+    def set_target_language(self, value: str) -> None:
+        """
+        Set the default target language"""
+        logger.debug("set_target_language: Setting source language to '%s'", value)
+        self._settings = LlmSettings(
+            provider=self._settings.provider,
+            model_name=self._settings.model_name,
+            temperature=self._settings.temperature,
+            temperature_enabled=self._settings.temperature_enabled,
+            inference_timeout=self._settings.inference_timeout,
+            source_language=self._settings.source_language,
+            target_language=value,
+        )
+
+    def get_source_language(self) -> str:
+        """Get the default source language"""
+        return self._settings.source_language
+
+    def get_target_language(self) -> str:
+        """Get the default source language"""
+        return self._settings.target_language

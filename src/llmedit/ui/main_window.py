@@ -1,12 +1,12 @@
 import logging
 from typing import Optional
 
-from PyQt6.QtCore import QPoint
+from PyQt6.QtCore import QPoint, Qt
 from PyQt6.QtGui import QScreen
 from PyQt6.QtWidgets import QApplication, QMainWindow
 
-from context import AppContext
-from ui.main_widget import MainWidget
+from llmedit.context import AppContext
+from llmedit.ui.main_widget import MainWidget
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +47,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("LLM Edit")
         self.default_width = 800
         self.default_height = 600
+
+        self.setObjectName("mainWindow")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
 
     def center_on_screen(self) -> None:
         """
