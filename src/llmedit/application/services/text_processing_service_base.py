@@ -4,6 +4,7 @@ from typing import Tuple
 from typing_extensions import override
 
 from config.application_prompts import ID_PROMPT_SYSTEM
+from config.prompts_raw import COMMON_SUFFIX
 from core.interfaces.processing.text_processing_service import TextProcessingService
 from core.models.data_types import (GenerationRequest, GenerationResponse, ProcessingContext, Prompt)
 
@@ -149,6 +150,7 @@ class TextProcessingServiceBase(TextProcessingService):
 
         system_prompt_template = self._build_system_prompt(model_info, system_prompt)
         user_prompt_template = self._build_user_prompt(model_info, user_prompt, processing_context)
+        user_prompt_template = f"{user_prompt_template}\n{COMMON_SUFFIX}"
 
         logger.debug(
             "process: Prompt templates prepared - system_len=%d, user_len=%d",
