@@ -1,0 +1,366 @@
+/* === Global Base Styles === */
+BaseWidget {
+    background-color: {{color-surface}};
+    color: {{color-on-surface}};
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    padding: 0;
+    margin: 0;
+}
+
+
+QTextEdit, QPlainTextEdit {
+    background-color: {{color-secondary-container}};
+    color: {{color-on-secondary-container}};
+    border: 1px solid {{color-primary}};
+    padding: 8px;
+    border-radius: 6px;
+}
+QTextEdit:focus, QPlainTextEdit:focus {
+    border: 2px solid {{color-primary}};
+    outline: none;
+}
+
+/* === App Bar === */
+#appTopBar {
+    background-color: {{color-primary}};
+    min-height: 32px;
+    padding: 0 8px;
+}
+
+#appTopBarTitleLink {
+    background-color: transparent;
+    color: {{color-on-primary}};
+    font-size: 15px;
+    padding: 0 8px;
+}
+
+#appTopBarSettingsButton {
+    background-color: transparent;
+    color: {{color-on-primary}};
+    border: 1px solid {{color-on-primary}};
+    border-radius: 4px;
+    padding: 3px 10px;
+    min-width: 64px;
+    text-align: center;
+}
+
+#appTopBarSettingsButton:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: {{color-on-primary}};
+}
+
+#appTopBarSettingsButton:pressed {
+    background-color: rgba(255, 255, 255, 0.24);
+    border-color: {{color-on-primary}};
+}
+
+/* === Status Bar === */
+#bottomBar {
+    background-color: {{color-primary}};
+    padding: 4px 8px;
+}
+
+#bottomBar QLabel {
+    background: transparent;
+    color: {{color-on-primary}};
+    font-size: 12px;
+}
+
+/* === Central Widget === */
+
+#actionTabsWidget QWidget {
+    background-color: {{color-surface}};
+    color: {{color-on-secondary-container}};
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+#actionTabsWidget QTabBar {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    spacing: 8px;
+}
+QTabWidget::pane { /* The tab widget frame */
+    border-top: 2px solid {{color-primary}};
+    position: absolute;
+    top: 0;
+}
+
+QTabWidget::tab-bar {
+    alignment: center;
+}
+
+#actionTabsWidget QTabBar::tab {
+    background-color: transparent;
+    color: {{color-on-surface}};
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 8px 16px;
+    min-width: 100px;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+#actionTabsWidget QTabBar::tab:hover {
+    color: {{color-primary}};
+    border-bottom: 2px solid {{color-primary}};
+}
+
+#actionTabsWidget QTabBar::tab:selected {
+    color: {{color-primary}};
+    border-bottom: 4px solid {{color-primary}};
+}
+
+#actionTabsWidget {
+    border: none;
+}
+
+#actionControlsWidget QWidget {
+    background-color: {{color-surface}};
+    color: {{color-on-surface}};
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+#actionControlsWidgetScrollArea QPushButton {
+    background-color: transparent;
+    color: {{color-primary}};
+    border: 1px solid {{color-primary}};
+    border-radius: 6px;
+    padding: 8px 8px;
+    min-height: 16px;
+    font-size: 16px;
+}
+
+#actionControlsWidgetScrollArea QPushButton:hover {
+    background-color: rgba(0,107,95, 0.08);
+}
+
+#actionControlsWidgetScrollArea QPushButton:pressed {
+    background-color: rgba(0,107,95, 0.16);
+    opacity: 0.9;
+}
+
+#actionControlsWidget QComboBox {
+    background-color: transparent;
+    color: {{color-primary}};
+    border: 1px solid {{color-primary}};
+    border-radius: 6px;
+    padding: 8px 8px;
+    min-height: 16px;
+    font-size: 16px;
+    selection-background-color: {{color-primary}};
+    selection-color: {{color-on-primary}};
+}
+
+#actionControlsWidget QComboBox:focus {
+    border-color: {{color-primary}};
+    outline: none;
+}
+
+#actionControlsWidget QComboBox:hover {
+    background-color: rgba(0,107,95, 0.08);
+    border-color: {{color-on-secondary-container}};
+}
+
+#actionControlsWidget QComboBox:pressed {
+    background-color: rgba(0,107,95, 0.16);
+}
+
+#textInteractionAreasWidget QToolButton {
+    background-color: {{color-secondary}};
+    color: {{color-on-secondary}};
+    border: none;
+    border-radius: 4px;
+    padding: 3px 3px;
+    min-height: 5px;
+}
+
+#textInteractionAreasWidget QToolButton:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+#textInteractionAreasWidget QToolButton:pressed {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+#textInteractionAreasWidget QToolButton:pressed {
+    background-color: {{color-surface-dim}};
+}
+
+
+/* === Global Disabled States === */
+BaseWidget:disabled {
+    color: rgba(63, 73, 70, 0.6); /* 60% opacity of color-on-surface */
+    background-color: {{color-surface-dim}};
+}
+
+QTextEdit:disabled, QPlainTextEdit:disabled {
+    background-color: {{color-surface-dim}};
+    color: rgba(63, 73, 70, 0.6);
+    border-color: rgba(0, 107, 95, 0.3);
+}
+
+/* === App Bar Disabled === */
+#appTopBarSettingsButton:disabled {
+    background-color: transparent;
+    color: rgba(255, 255, 255, 0.5); /* 50% opacity of color-on-primary */
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* === Status Bar Disabled === */
+#bottomBar QLabel:disabled {
+    color: rgba(255, 255, 255, 0.5); /* 50% opacity of color-on-primary */
+}
+
+/* === Action Tabs Disabled === */
+#actionTabsWidget QTabBar::tab:disabled {
+    color: rgba(63, 73, 70, 0.5); /* 50% opacity of color-on-surface */
+    border-bottom-color: transparent;
+    background-color: transparent;
+}
+
+/* === Action Controls Disabled === */
+#actionControlsWidgetScrollArea QPushButton:disabled {
+    background-color: transparent;
+    color: rgba(0, 107, 95, 0.5); /* 50% opacity of color-primary */
+    border-color: rgba(0, 107, 95, 0.5);
+    opacity: 0.7;
+}
+
+#actionControlsWidget QComboBox:disabled {
+    background-color: transparent;
+    color: rgba(0, 107, 95, 0.5); /* 50% opacity of color-primary */
+    border-color: rgba(0, 107, 95, 0.5);
+}
+
+/* === Text Interaction Areas Disabled === */
+#textInteractionAreasWidget QToolButton:disabled {
+    background-color: rgba(74, 99, 94, 0.5); /* 50% opacity of color-secondary */
+    color: rgba(255, 255, 255, 0.6); /* 60% opacity of color-on-secondary */
+}
+
+/* Additional specific disabled states */
+QTabWidget::pane:disabled {
+    border-top-color: rgba(0, 107, 95, 0.3);
+}
+
+#actionControlsWidget:disabled, #actionControlsWidgetScrollArea:disabled, #actionTabsWidget QWidget:disabled, #actionControlsWidget QWidget:disabled {
+    background-color: {{color-surface-dim}};
+}
+
+
+
+
+
+
+
+/* === Settings Dialog === */
+QDialog#settingsDialog {
+    background-color: {{color-surface}};
+    color: {{color-on-surface}};
+}
+
+/* === Labels === */
+QDialog#settingsDialog QLabel {
+    background: transparent;
+    color: {{color-on-surface}};
+    font-size: 14px;
+    padding: 4px 0;
+    border: none;
+}
+
+QComboBox#settingsDialog  {
+    background-color: transparent;
+    color: {{color-primary}};
+    border: 1px solid {{color-primary}};
+    border-radius: 6px;
+    padding: 8px 8px;
+    min-height: 16px;
+    font-size: 16px;
+    selection-background-color: {{color-primary}};
+    selection-color: {{color-on-primary}};
+}
+
+QComboBox#settingsDialog:focus {
+    border-color: {{color-primary}};
+    outline: none;
+}
+
+QComboBox#settingsDialog:hover {
+    background-color: rgba(0,107,95, 0.08);
+    border-color: {{color-on-secondary-container}};
+}
+
+QComboBox#settingsDialog:pressed {
+    background-color: rgba(0,107,95, 0.16);
+}
+
+
+
+/* === Dialog Buttons === */
+
+/* Save = solid primary */
+QPushButton#saveButton {
+    background-color: {{color-primary}};
+    color: {{color-on-primary}};
+    border: none;
+    border-radius: 6px;
+    padding: 8px 8px;
+}
+
+QPushButton#saveButton:hover {
+    background-color: rgba(0, 107, 95, 0.5);
+}
+
+QPushButton#saveButton:pressed {
+    background-color: rgba(0, 107, 95, 0.8);
+}
+
+QPushButton#saveButton:focus {
+    outline: 2px solid rgba(0, 107, 95, 0.3);
+    outline-offset: 2px;
+}
+
+QPushButton#saveButton:disabled {
+    background-color: rgba(0, 107, 95, 0.5);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Cancel = outlined */
+QPushButton#cancelButton {
+    background: transparent;
+    color: {{color-primary}};
+    border: 1px solid {{color-primary}};
+    border-radius: 6px;
+    padding: 8px 8px;
+}
+
+QPushButton#cancelButton:hover {
+    background-color: rgba(0, 107, 95, 0.08);
+}
+
+QPushButton#cancelButton:pressed {
+    background-color: rgba(0, 107, 95, 0.16);
+}
+
+QPushButton#cancelButton:focus {
+    outline: 2px solid rgba(0, 107, 95, 0.3);
+    outline-offset: 2px;
+}
+
+QPushButton#cancelButton:disabled {
+    color: rgba(0, 107, 95, 0.5);
+    border-color: rgba(0, 107, 95, 0.5);
+    background: transparent;
+}
+
+#settingsTempSlider:disabled {
+    background: {{color-surface-dim}}
+}
