@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 from typing import List, override
 
-from config.gguf_models import PREDEFINED_GGUF_MODELS
+from config.predefined_gguf_models import PREDEFINED_GGUF_MODELS
 from core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
 from core.models.settings import LlmModel
 

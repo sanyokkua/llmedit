@@ -18,7 +18,7 @@ from config.prompts_raw import (
     TRANSLATE_DICTIONARY,
 )
 from core.models.data_types import Prompt
-from core.models.enums.prompt import PromptCategory
+from core.models.enums.prompt_category import PromptCategory
 
 ID_PROMPT_SYSTEM = 'prompt_system'
 ID_PROMPT_FORMAT_CHAT = 'prompt_format_chat'

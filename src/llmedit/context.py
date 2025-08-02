@@ -6,9 +6,9 @@ from PyQt6.QtCore import QObject, QThreadPool, pyqtSignal
 
 from application.services.default_supported_translation_languages_service import \
     DefaultSupportedTranslationLanguagesService
-from application.services.prompt_service import AppPromptService
+from application.services.app_prompt_service import AppPromptService
 from application.services.text_processing_service_base import TextProcessingServiceBase
-from application.services.text_sanitization_service import ReasoningTextSanitizationService
+from application.services.reasoning_text_sanitization_service import ReasoningTextSanitizationService
 from config.in_memory_settings_service import InMemorySettingsService
 from core.interfaces.background.task_service import TaskService
 from core.interfaces.processing.supported_translation_languages_service import SupportedTranslationLanguagesService
@@ -18,7 +18,7 @@ from core.interfaces.settings.settings_service import SettingsService
 from infra.providers.settings_llamacpp_provider import SettingsLlamaCppProvider
 from infra.providers.settings_ollama_provider import SettingsOllamaProvider
 from infra.providers.standard_model_service_provider import StandardModelServiceProvider
-from qt_based.task_service import TaskServiceImpl
+from qt_based.task_service_impl import TaskServiceImpl
 
 logger = logging.getLogger(__name__)
 

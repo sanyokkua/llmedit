@@ -4,7 +4,7 @@ from typing import Optional
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import (QMessageBox, QSizePolicy, QVBoxLayout, QWidget)
 
-from config.prompts_objects import PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE, PROMPT_PARAM_USER_TEXT
+from config.application_prompts import PROMPT_PARAM_INPUT_LANGUAGE, PROMPT_PARAM_OUTPUT_LANGUAGE, PROMPT_PARAM_USER_TEXT
 from context import AppContext
 from core.models.data_types import ProcessingContext, TaskInput, TaskResult
 from ui.base_widget import BaseWidget

@@ -3,10 +3,10 @@ from typing import Dict, Mapping, Sequence, Tuple
 
 from typing_extensions import override
 
-from config.prompts_objects import APPLICATION_PROMPTS
+from config.application_prompts import APPLICATION_PROMPTS
 from core.interfaces.prompt.prompt_service import PromptService
 from core.models.data_types import Prompt
-from core.models.enums.prompt import PromptCategory
+from core.models.enums.prompt_category import PromptCategory
 
 logger = logging.getLogger(__name__)
 

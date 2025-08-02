@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List
 
 from core.models.data_types import Prompt
-from core.models.enums.prompt import PromptCategory
+from core.models.enums.prompt_category import PromptCategory
 
 
 class PromptService(ABC):

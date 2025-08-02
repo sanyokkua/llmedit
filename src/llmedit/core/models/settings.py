@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from core.models.enums.settings import LlmProviderType
+from core.models.enums.llm_provider_type import LlmProviderType
 
 
 @dataclass(frozen=True)

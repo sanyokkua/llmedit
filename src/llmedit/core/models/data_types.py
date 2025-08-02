@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Callable, List, Optional
 
-from core.models.enums.prompt import PromptCategory
+from core.models.enums.prompt_category import PromptCategory
 
 
 @dataclass(frozen=True)

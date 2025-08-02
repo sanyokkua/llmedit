@@ -2,11 +2,11 @@ import logging
 from pathlib import Path
 from typing import Optional, override
 
-from config.gguf_models import PREDEFINED_GGUF_MODELS
+from config.predefined_gguf_models import PREDEFINED_GGUF_MODELS
 from core.interfaces.llm_model.model_service import ModelService
 from core.interfaces.llm_model.model_service_provider import ModelServiceProvider
 from core.interfaces.settings.settings_service import SettingsService
-from core.models.enums.settings import LlmProviderType
+from core.models.enums.llm_provider_type import LlmProviderType
 from core.models.settings import ModelInformation
 from infra.services.llama_cpp_model_service import LlamaCppModelService
 from infra.services.ollama_model_service import OllamaModelService

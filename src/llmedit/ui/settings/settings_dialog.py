@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import (QCheckBox, QComboBox, QDialog, QDialogButtonBox, QF
 
 from context import AppContext
 from core.interfaces.settings.settings_service import SettingsService
-from core.models.enums.settings import LlmProviderType
+from core.models.enums.llm_provider_type import LlmProviderType
 from core.models.settings import SettingsState
 
 

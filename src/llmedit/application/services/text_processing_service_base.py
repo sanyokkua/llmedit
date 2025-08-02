@@ -3,7 +3,7 @@ from typing import Tuple
 
 from typing_extensions import override
 
-from config.prompts_objects import ID_PROMPT_SYSTEM
+from config.application_prompts import ID_PROMPT_SYSTEM
 from core.interfaces.processing.text_processing_service import TextProcessingService
 from core.models.data_types import (GenerationRequest, GenerationResponse, ProcessingContext, Prompt)
 

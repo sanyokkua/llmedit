@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (QSizePolicy, QTabWidget, QWidget)
 
 from context import AppContext
-from core.models.enums.prompt import PromptCategory
+from core.models.enums.prompt_category import PromptCategory
 from ui.content.tab_widgets.action_controls_widget import ActionControlsWidget, ActionEvent
 
 logger = logging.getLogger(__name__)
