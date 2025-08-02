@@ -26,7 +26,6 @@ class TextInteractionAreasWidget(BaseWidget):
     Features include:
     - Input area with paste button to import text from clipboard
     - Output area with copy button to export text to clipboard
-    - Read-only output display with rich text disabled
     - Responsive layout with labeled sections
     """
 
@@ -83,7 +82,6 @@ class TextInteractionAreasWidget(BaseWidget):
             logger.debug("__init__: Copy button initialized")
 
             self._output_text = QTextEdit()
-            self._output_text.setReadOnly(True)
             self._output_text.setAcceptRichText(False)
             self._output_text.setSizePolicy(
                 QSizePolicy.Policy.Expanding,
