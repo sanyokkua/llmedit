@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Callable
 
-from core.models.data_types import TaskInput, TaskResult
+from llmedit.core.models.data_types import TaskInput, TaskResult
 
 
 class TaskService(ABC):

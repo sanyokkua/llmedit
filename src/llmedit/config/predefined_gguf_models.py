@@ -1,4 +1,4 @@
-from core.models.settings import ModelInformation
+from llmedit.core.models.settings import ModelInformation
 
 PREDEFINED_GGUF_MODELS = [
     ModelInformation(

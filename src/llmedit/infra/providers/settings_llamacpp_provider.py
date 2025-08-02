@@ -2,9 +2,9 @@ import logging
 from pathlib import Path
 from typing import List, override
 
-from config.predefined_gguf_models import PREDEFINED_GGUF_MODELS
-from core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
-from core.models.settings import LlmModel
+from llmedit.config.predefined_gguf_models import PREDEFINED_GGUF_MODELS
+from llmedit.core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
+from llmedit.core.models.settings import LlmModel
 
 logger = logging.getLogger(__name__)
 

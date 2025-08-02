@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from core.interfaces.llm_model.model_service import ModelService
-from core.interfaces.settings.settings_service import SettingsService
+from llmedit.core.interfaces.llm_model.model_service import ModelService
+from llmedit.core.interfaces.settings.settings_service import SettingsService
 
 
 class ModelServiceProvider(ABC):

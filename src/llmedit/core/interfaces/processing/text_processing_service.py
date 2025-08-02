@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 
-from core.interfaces.llm_model.model_service_provider import ModelServiceProvider
-from core.interfaces.processing.text_sanitization_service import TextSanitizationService
-from core.interfaces.prompt.prompt_service import PromptService
-from core.interfaces.settings.settings_service import SettingsService
-from core.models.data_types import GenerationRequest, GenerationResponse, ProcessingContext
+from llmedit.core.interfaces.llm_model.model_service_provider import ModelServiceProvider
+from llmedit.core.interfaces.processing.text_sanitization_service import TextSanitizationService
+from llmedit.core.interfaces.prompt.prompt_service import PromptService
+from llmedit.core.interfaces.settings.settings_service import SettingsService
+from llmedit.core.models.data_types import GenerationRequest, GenerationResponse, ProcessingContext
 
 
 class TextProcessingService(ABC):

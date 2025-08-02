@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
 
-from core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
-from core.models.enums.llm_provider_type import LlmProviderType
-from core.models.settings import LlmModel, SettingsState
+from llmedit.core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
+from llmedit.core.models.enums.llm_provider_type import LlmProviderType
+from llmedit.core.models.settings import LlmModel, SettingsState
 
 
 class SettingsService(ABC):

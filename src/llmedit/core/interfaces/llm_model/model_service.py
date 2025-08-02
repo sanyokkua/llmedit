@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-from core.models.data_types import GenerationRequest, GenerationResponse
-from core.models.settings import ModelInformation
+from llmedit.core.models.data_types import GenerationRequest, GenerationResponse
+from llmedit.core.models.settings import ModelInformation
 
 
 class ModelService(ABC):

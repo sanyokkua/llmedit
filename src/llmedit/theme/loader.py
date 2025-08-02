@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 
-from theme.colors import COLORS
+from llmedit.theme.colors import COLORS
 
 logger = logging.getLogger(__name__)
 

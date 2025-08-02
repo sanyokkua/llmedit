@@ -2,10 +2,10 @@ import logging
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional
 
-from core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
-from core.interfaces.settings.settings_service import SettingsService
-from core.models.enums.llm_provider_type import LlmProviderType
-from core.models.settings import LlmModel, SettingsState
+from llmedit.core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
+from llmedit.core.interfaces.settings.settings_service import SettingsService
+from llmedit.core.models.enums.llm_provider_type import LlmProviderType
+from llmedit.core.models.settings import LlmModel, SettingsState
 
 logger = logging.getLogger(__name__)
 

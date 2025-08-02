@@ -1,4 +1,4 @@
-from config.prompts_raw import (
+from llmedit.config.prompts_raw import (
     FORMAT_CHAT,
     FORMAT_EMAIL,
     FORMAT_INSTRUCTION_GUIDE,
@@ -17,8 +17,8 @@ from config.prompts_raw import (
     TRANSLATE_BASE,
     TRANSLATE_DICTIONARY,
 )
-from core.models.data_types import Prompt
-from core.models.enums.prompt_category import PromptCategory
+from llmedit.core.models.data_types import Prompt
+from llmedit.core.models.enums.prompt_category import PromptCategory
 
 ID_PROMPT_SYSTEM = 'prompt_system'
 ID_PROMPT_FORMAT_CHAT = 'prompt_format_chat'

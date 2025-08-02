@@ -9,9 +9,9 @@ from llama_cpp import (
     Llama,
 )
 
-from core.interfaces.llm_model.model_service import ModelService
-from core.models.data_types import GenerationRequest, GenerationResponse
-from core.models.settings import ModelInformation
+from llmedit.core.interfaces.llm_model.model_service import ModelService
+from llmedit.core.models.data_types import GenerationRequest, GenerationResponse
+from llmedit.core.models.settings import ModelInformation
 
 logger = logging.getLogger(__name__)
 

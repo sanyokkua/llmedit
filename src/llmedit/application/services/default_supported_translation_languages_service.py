@@ -1,7 +1,7 @@
 import logging
 from typing import Sequence
 
-from core.interfaces.processing.supported_translation_languages_service import (
+from llmedit.core.interfaces.processing.supported_translation_languages_service import (
     SupportedTranslationLanguagesService,
 )
 

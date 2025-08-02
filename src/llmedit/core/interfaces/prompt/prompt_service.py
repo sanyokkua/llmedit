@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from core.models.data_types import Prompt
-from core.models.enums.prompt_category import PromptCategory
+from llmedit.core.models.data_types import Prompt
+from llmedit.core.models.enums.prompt_category import PromptCategory
 
 
 class PromptService(ABC):

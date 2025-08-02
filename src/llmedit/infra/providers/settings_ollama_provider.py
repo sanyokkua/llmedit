@@ -3,8 +3,8 @@ from typing import List, override
 
 import ollama
 
-from core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
-from core.models.settings import LlmModel
+from llmedit.core.interfaces.settings.settings_llm_provider import SettingsLLMProvider
+from llmedit.core.models.settings import LlmModel
 
 logger = logging.getLogger(__name__)
 

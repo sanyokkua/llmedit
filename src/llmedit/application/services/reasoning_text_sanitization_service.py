@@ -2,7 +2,7 @@ import logging
 import re
 from typing import override
 
-from core.interfaces.processing.text_sanitization_service import TextSanitizationService
+from llmedit.core.interfaces.processing.text_sanitization_service import TextSanitizationService
 
 logger = logging.getLogger(__name__)
 

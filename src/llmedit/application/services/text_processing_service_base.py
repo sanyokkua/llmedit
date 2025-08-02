@@ -3,10 +3,10 @@ from typing import Tuple
 
 from typing_extensions import override
 
-from config.application_prompts import ID_PROMPT_SYSTEM
-from config.prompts_raw import COMMON_SUFFIX
-from core.interfaces.processing.text_processing_service import TextProcessingService
-from core.models.data_types import (GenerationRequest, GenerationResponse, ProcessingContext, Prompt)
+from llmedit.config.application_prompts import ID_PROMPT_SYSTEM
+from llmedit.config.prompts_raw import COMMON_SUFFIX
+from llmedit.core.interfaces.processing.text_processing_service import TextProcessingService
+from llmedit.core.models.data_types import (GenerationRequest, GenerationResponse, ProcessingContext, Prompt)
 
 logger = logging.getLogger(__name__)
 

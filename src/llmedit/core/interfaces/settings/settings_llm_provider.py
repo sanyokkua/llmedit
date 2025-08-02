@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from core.models.settings import LlmModel
+from llmedit.core.models.settings import LlmModel
 
 
 class SettingsLLMProvider(ABC):

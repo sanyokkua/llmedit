@@ -4,8 +4,8 @@ from typing import Callable, Dict, Set, override
 
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal
 
-from core.interfaces.background.task_service import TaskService
-from core.models.data_types import TaskInput, TaskResult
+from llmedit.core.interfaces.background.task_service import TaskService
+from llmedit.core.models.data_types import TaskInput, TaskResult
 
 logger = logging.getLogger(__name__)
 
